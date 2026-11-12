@@ -373,6 +373,10 @@ def export() -> dict:
         })
     nets = [{"name": name, "kind": kind, "level": level, "colour": colour, "about": about}
             for name, (kind, level, colour, about) in NETS.items()]
-    return {"boards": boards, "nets": nets,
+    from tv.hardware import cable_routes
+    return {"boards": boards, "nets": nets, "cables": cable_routes(),
+            "screen": {"width": cfg.ACTIVE_WIDTH, "height": cfg.ACTIVE_HEIGHT, "z": cfg.SCREEN_Z,
+                       "y": cfg.STACK_DEPTH + cfg.W_CELL_FRONT},
+            "stack_depth": cfg.STACK_DEPTH,
             "kinds": [{"kind": k, "title": KIND_TITLE[k]} for k in KIND_ORDER],
             "item_nets": ITEM_NETS, "item_role": ITEM_ROLE}

@@ -53,6 +53,10 @@ Then open <http://localhost:5173/>. Press Ctrl+C in the terminal to stop it.
 - **Parts** lists every item in groups; tick or untick a group or a single item.
   This is how you separate the wall mount from the TV, or show the stand feet.
 - **Explode** pulls every layer apart.
+- **Realistic rendering:** studio reflections, soft shadows, real material
+  finishes, a lit screen and backlight, round wires and a room. Under Display
+  you can switch the power off, hide the room, turn on CAD-style edge lines,
+  or untick High-quality rendering if your computer struggles.
 - **Click any part** for a card saying what it is, what it does and what it
   connects to. Components carry labels (U1, C3, CN2 ...) when you zoom in.
 - **Electrical** lists all 49 nets: power rails, mains, control, video, audio
@@ -127,4 +131,5 @@ No other file holds dimensions.
 | `validate.py` | Pass / fail validation report |
 | `index.html` | three.js web viewer |
 | `viewer_boards.js` | Draws the circuit boards in detail: components, traces, silkscreen |
+| `viewer_look.js` | Lighting, shadows, material finishes, lit screen, cables, the room |
 | `smoke_test.py` | Confirms the CAD toolchain works on this machine |

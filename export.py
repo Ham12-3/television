@@ -141,7 +141,7 @@ def export_tv(manifest: dict) -> int:
             "note": item.note,
             # Circuit boards are drawn in detail by the viewer from boards.json;
             # their STL files are still written for other tools.
-            "procedural": item.group in board_titles,
+            "procedural": item.group in board_titles or item.name in electrical["cables"],
             "nets": electrical["item_nets"].get(item.name, []),
             "role": electrical["item_role"].get(item.name, ""),
         })

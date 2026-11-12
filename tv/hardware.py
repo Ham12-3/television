@@ -5,11 +5,15 @@ Cables are drawn as straight box segments along the routes they take. They
 show what connects to what and where it runs; they are not harness drawings.
 """
 
+from build123d import Axis, fillet
+
 import config as cfg
 from parts.common import box
 from tv.board_data import IR, LED_DRIVER, MAIN, PSU, TCON, WIFI
 from tv.boards import connector_top
-from tv.common import cyl_w, fuse, group, ribbon, tbox, wire
+from tv.common import cyl_w, fuse, group, tbox
+from tv.common import ribbon as _ribbon
+from tv.common import wire as _wire
 from tv.panel import source_socket_top_w, source_socket_z
 
 HALF_X, HALF_Z = cfg.TV_WIDTH / 2, cfg.TV_HEIGHT / 2
@@ -23,7 +27,8 @@ def speakers():
     for side in (-1, 1):
         x = side * cfg.SPEAKER_X
         enclosure = tbox(x - sx / 2, x + sx / 2, z0, z0 + sz, w0, w0 + sd)
-        driver = tbox(x - 40, x + 40, z0 - 1.5, z0, w0 + 4, w0 + sd - 8)   # faces the grille
+        enclosure = fillet(enclosure.edges().filter_by(Axis.X), 3.0)       # rounded long edges
+        driver = tbox(x - 40, x + 40, z0 - 1.5, z0 + 1.0, w0 + 4, w0 + sd - 8)   # faces the grille
         units.append(enclosure + driver)
     return group(units)
 
@@ -51,6 +56,8 @@ def stand_feet():
         x = side * cfg.FOOT_X
         bar = box(x - width / 2, x + width / 2, y_mid - length / 2, y_mid + length / 2,
                   -HALF_Z - tall, -HALF_Z)
+        bar = fillet(bar.edges().filter_by(Axis.Z), 8.0)       # rounded ends
+        bar = fillet(bar.edges().group_by(Axis.Z)[-1], 3.0)    # soft top edge
         tongue = tbox(x - 10, x + 10, -HALF_Z, -HALF_Z + 25, 20, 28)    # slots into the cover
         feet.append(bar + tongue)
     return group(feet)
@@ -60,6 +67,19 @@ def cables() -> dict:
     """Every internal cable, by name."""
     out = {}
     harness_t = 2.5
+    specs = []          # the route of each cable, in the order they are made
+
+    # Local wrappers that remember each route, so the viewer can draw the
+    # cables as round wires and ribbons instead of the plain CAD boxes.
+    def wire(points, size):
+        specs.append({"kind": "wire", "points": [list(p) for p in points],
+                      "width": size[0], "thick": size[1]})
+        return _wire(points, size)
+
+    def ribbon(points, width):
+        specs.append({"kind": "ribbon", "points": [list(p) for p in points],
+                      "width": width, "thick": 0.3})
+        return _ribbon(points, width)
 
     # PSU -> main board: 12 V, ground, standby and backlight control.
     xa, za, wa = connector_top(PSU, "CN2")
@@ -135,4 +155,18 @@ def cables() -> dict:
     xa, za, wa = connector_top(MAIN, "CN5")
     xb, zb, wb = connector_top(WIFI, "CN1")
     out["cable_wifi"] = wire([(xb, za, wa - 1), (xb, zb, wb - 1)], (2, 2))
+
+    ROUTES.clear()
+    ROUTES.update(zip(out.keys(), specs))       # one route per cable, same order
     return out
+
+
+# name -> {"kind", "points" [(X, Z, w)], "width", "thick"}; filled by cables().
+ROUTES = {}
+
+
+def cable_routes() -> dict:
+    """The path of every cable, for the viewer."""
+    if not ROUTES:
+        cables()
+    return ROUTES

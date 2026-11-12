@@ -1857,7 +1857,7 @@
         26.0,
         33.5
       ],
-      "mass_g": 167.8,
+      "mass_g": 166.2,
       "count": 2,
       "note": "",
       "procedural": false,
@@ -1922,7 +1922,7 @@
       "mass_g": 13.8,
       "count": 1,
       "note": "",
-      "procedural": false,
+      "procedural": true,
       "nets": [
         "+12V",
         "GND",
@@ -1957,7 +1957,7 @@
       "mass_g": 3.6,
       "count": 1,
       "note": "",
-      "procedural": false,
+      "procedural": true,
       "nets": [
         "+36V",
         "GND",
@@ -1990,7 +1990,7 @@
       "mass_g": 2.1,
       "count": 1,
       "note": "",
-      "procedural": false,
+      "procedural": true,
       "nets": [
         "LED+",
         "LED-"
@@ -2021,7 +2021,7 @@
       "mass_g": 1.6,
       "count": 1,
       "note": "",
-      "procedural": false,
+      "procedural": true,
       "nets": [
         "AC_L",
         "AC_N"
@@ -2052,7 +2052,7 @@
       "mass_g": 1.0,
       "count": 1,
       "note": "",
-      "procedural": false,
+      "procedural": true,
       "nets": [
         "LVDS",
         "+12V",
@@ -2085,7 +2085,7 @@
       "mass_g": 0.7,
       "count": 1,
       "note": "",
-      "procedural": false,
+      "procedural": true,
       "nets": [
         "MINI_LVDS",
         "GAMMA",
@@ -2119,7 +2119,7 @@
       "mass_g": 2.9,
       "count": 1,
       "note": "",
-      "procedural": false,
+      "procedural": true,
       "nets": [
         "MINI_LVDS",
         "GAMMA",
@@ -2153,7 +2153,7 @@
       "mass_g": 1.6,
       "count": 1,
       "note": "",
-      "procedural": false,
+      "procedural": true,
       "nets": [
         "SPK_R"
       ],
@@ -2183,7 +2183,7 @@
       "mass_g": 8.3,
       "count": 1,
       "note": "",
-      "procedural": false,
+      "procedural": true,
       "nets": [
         "SPK_L"
       ],
@@ -2213,7 +2213,7 @@
       "mass_g": 1.7,
       "count": 1,
       "note": "",
-      "procedural": false,
+      "procedural": true,
       "nets": [
         "IR_RX",
         "LED_STBY",
@@ -2247,7 +2247,7 @@
       "mass_g": 0.3,
       "count": 1,
       "note": "",
-      "procedural": false,
+      "procedural": true,
       "nets": [
         "USB_WIFI",
         "+5V",
@@ -2276,7 +2276,7 @@
         200.0,
         37.0
       ],
-      "mass_g": 134.4,
+      "mass_g": 131.3,
       "count": 2,
       "note": "Not fitted when the TV is on the wall mount",
       "procedural": false,
@@ -2304,7 +2304,7 @@
         44.0,
         9.0
       ],
-      "mass_g": 14.0,
+      "mass_g": 13.5,
       "count": 1,
       "note": "Accessory: shown on the table in front of the TV",
       "procedural": false,
@@ -2444,7 +2444,7 @@
         44.0,
         11.0
       ],
-      "mass_g": 16.0,
+      "mass_g": 15.5,
       "count": 1,
       "note": "Accessory: shown on the table in front of the TV",
       "procedural": false,

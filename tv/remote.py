@@ -56,6 +56,7 @@ def _ir_led_hole():
 
 def bottom_shell():
     shell = _rounded_block(HL, HW, 0, SPLIT, CORNER)
+    shell = fillet(shell.edges().group_by(Axis.Z)[0], 2.5)        # soft underside edge
     shell -= _rounded_block(HL - WALL, HW - WALL, WALL, SPLIT + 1, CORNER - WALL)
     x0, x1, half = DOOR
     shell -= box(x0, x1, -half, half, -1, WALL + 0.01)
@@ -69,6 +70,7 @@ def battery_door():
 
 def top_shell():
     shell = _rounded_block(HL, HW, SPLIT, THICK, CORNER)
+    shell = fillet(shell.edges().group_by(Axis.Z)[-1], 2.5)       # soft top edge
     shell -= _rounded_block(HL - WALL, HW - WALL, SPLIT - 1, THICK - WALL, CORNER - WALL)
     holes = [_button(kind, x, y, size, THICK - WALL - 1, THICK + 1, grow=0.3)
              for kind, x, y, size in BUTTONS]

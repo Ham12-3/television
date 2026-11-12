@@ -169,8 +169,10 @@
   <div id="groups"></div>
 
   <h2>Display</h2>
-  <label class="opt"><input id="edges" type="checkbox" checked> Show edges</label>
-  <label class="opt"><input id="wall" type="checkbox" checked> Show wall</label>
+  <label class="opt"><input id="power" type="checkbox" checked> Power on (screen and backlight lit)</label>
+  <label class="opt"><input id="quality" type="checkbox" checked> High-quality rendering</label>
+  <label class="opt"><input id="wall" type="checkbox" checked> Show the room</label>
+  <label class="opt"><input id="edges" type="checkbox"> CAD-style edge lines</label>
 </aside>
 
 <main id="stage">
@@ -200,6 +202,8 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { STLLoader } from "three/addons/loaders/STLLoader.js";
 import { buildBoards } from "./viewer_boards.js";
+import { addBoxUVs, buildCables, buildRoom, buildScreen, enableShadows, materialFor, setupRendering }
+  from "./viewer_look.js";
 
 const STL_FOLDER = "output/stl/";
 const stage = document.getElementById("stage");
@@ -211,7 +215,7 @@ const dark = matchMedia("(prefers-color-scheme: dark)");
 // ---- scene ---------------------------------------------------------------
 // The model is Z-up: X along the wall, Y out from the wall, Z up.
 const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
 stage.prepend(renderer.domElement);
 
 const scene = new THREE.Scene();
@@ -221,21 +225,16 @@ camera.up.set(0, 0, 1);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 
-scene.add(new THREE.HemisphereLight(0xffffff, 0x666670, 1.7));
-const key = new THREE.DirectionalLight(0xffffff, 2.0);
-scene.add(key);                               // follows the camera, see the render loop
+// Lighting, reflections, shadows and post-processing all live in viewer_look.js.
+const look = setupRendering(renderer, scene, camera);
 
-// A translucent sheet standing in for the wall, at Y = 0.
-const wall = new THREE.Mesh(
-  new THREE.PlaneGeometry(1100, 700),
-  new THREE.MeshBasicMaterial({ color: 0x8a8a90, transparent: true, opacity: 0.10,
-                                side: THREE.DoubleSide, depthWrite: false }));
-wall.rotation.x = Math.PI / 2;
-wall.position.y = -0.3;
-scene.add(wall);
+// A painted wall behind the set and a sideboard below it.
+const TABLE_TOP_Z = -227;                     // where the stand feet would rest
+const room = buildRoom(TABLE_TOP_Z);
+scene.add(room);
 
 function applyTheme() {
-  scene.background = new THREE.Color(dark.matches ? 0x1c1d21 : 0xf4f4f2);
+  scene.background = new THREE.Color(dark.matches ? 0x5a5c63 : 0xd9d6cf);
 }
 dark.addEventListener("change", applyTheme);
 applyTheme();
@@ -245,6 +244,7 @@ const parts = [];                             // one per viewer entry: { entry, 
 const byGroup = new Map();                    // group name -> parts
 const byName = new Map();                     // entry name -> part
 let loaded = false;                           // true once every part is in the scene
+let screen = null;                            // the lit picture on the front of the LCD
 let electrical = null;                        // boards.json
 let boards = null;                            // result of buildBoards()
 const netInfo = new Map();                    // net name -> { name, kind, level, colour, about }
@@ -261,6 +261,7 @@ async function loadModel() {
   electrical = boardData;
   electrical.nets.forEach((n) => netInfo.set(n.name, n));
   boards = buildBoards(electrical, renderer);
+  const cableGroups = buildCables(electrical.cables, electrical.stack_depth);
 
   const loader = new STLLoader();
   // Python's simple web server refuses connections if too many arrive at
@@ -280,22 +281,25 @@ async function loadModel() {
     let group, mesh = null, edges = null;
     if (entry.procedural && boards.groups.has(entry.name)) {
       group = boards.groups.get(entry.name);          // drawn in detail from boards.json
+    } else if (entry.procedural && cableGroups.has(entry.name)) {
+      group = cableGroups.get(entry.name);            // round wires and ribbons
+      group.userData.pick = { type: "item", entry };
     } else {
       const geometry = await loadMesh(entry.file);
       geometry.computeVertexNormals();
-      const seeThrough = (entry.opacity ?? 1) < 1;
-      mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
-        color: colour, roughness: 0.7, metalness: 0.05,
-        transparent: seeThrough, opacity: entry.opacity ?? 1, depthWrite: !seeThrough }));
+      addBoxUVs(geometry);                            // so textures can be applied
+      mesh = new THREE.Mesh(geometry, materialFor(entry, colour));
       mesh.userData.pick = { type: "item", entry };
       // Outline sharp edges so dark parts stay readable against each other.
       edges = new THREE.LineSegments(
         new THREE.EdgesGeometry(geometry, 35),
         new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.35 }));
+      edges.visible = false;                          // CAD-style outlines are off by default
       group = new THREE.Group();
       group.add(mesh, edges);
     }
     group.visible = entry.visible !== false;
+    enableShadows(group);
     scene.add(group);
     group.updateMatrixWorld(true);
     const part = { entry, group, mesh, edges, colour, index, box: new THREE.Box3().setFromObject(group) };
@@ -317,6 +321,12 @@ async function loadModel() {
     if (!byGroup.has(p.entry.group)) byGroup.set(p.entry.group, []);
     byGroup.get(p.entry.group).push(p);
   }
+
+  // The picture on the screen rides on the LCD cell, so it explodes and hides with it.
+  screen = buildScreen(electrical.screen);
+  screen.userData.pick = { type: "item", entry: byName.get("lcd_cell").entry };
+  byName.get("lcd_cell").group.add(screen);
+  applyPower();
 
   buildPartTree();
   buildNetList();
@@ -440,7 +450,7 @@ function setView(name) {
   const distance = radius / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.05;
   controls.target.copy(centre);
   camera.position.copy(centre).addScaledVector(direction, distance);
-  camera.near = Math.max(distance / 2000, 0.5);
+  camera.near = Math.max(distance / 150, 2);   // a tight depth range keeps close surfaces from flickering
   camera.far = distance * 40;
   camera.updateProjectionMatrix();
   controls.update();
@@ -460,7 +470,9 @@ document.getElementById("explode").addEventListener("change", () => { frame(); s
 document.getElementById("edges").addEventListener("change", (e) => {
   parts.forEach((p) => { if (p.edges) p.edges.visible = e.target.checked; });
 });
-document.getElementById("wall").addEventListener("change", (e) => { wall.visible = e.target.checked; });
+document.getElementById("wall").addEventListener("change", (e) => { room.visible = e.target.checked; });
+document.getElementById("power").addEventListener("change", () => { selectNet(null); });
+document.getElementById("quality").addEventListener("change", (e) => { look.quality = e.target.checked; });
 
 // ---- electrical: nets --------------------------------------------------------
 let activeNet = null;
@@ -504,7 +516,8 @@ function netMembers(name) {
 function selectNet(name) {
   activeNet = name;
   halos.splice(0).forEach((h) => h.parent.remove(h));
-  parts.forEach((p) => { if (p.mesh) p.mesh.material.emissive.setHex(0x000000); });
+  parts.forEach((p) => setGlow(p, null));
+  applyPower();                               // put back the backlight glow
   boards.redraw(name);                        // repaint the copper traces
   document.querySelectorAll(".net").forEach((b) => b.classList.toggle("on", b.dataset.net === name));
   if (!name) return;
@@ -520,11 +533,36 @@ function selectNet(name) {
       halo.userData.halo = true;
       m.component.object.add(halo);
       halos.push(halo);
-    } else if (m.item.mesh) {
-      m.item.mesh.material.emissive.set(n.colour).multiplyScalar(0.55);
+    } else {
+      setGlow(m.item, n.colour);
     }
   }
   showNetCard(n, members);
+}
+
+// Make an STL item or a cable glow in a net's colour (null turns it off).
+function setGlow(part, colour) {
+  if (part.entry.procedural && !part.group.userData.pick) return;   // circuit boards use halos instead
+  part.group.traverse((o) => {
+    if (!o.isMesh || o === screen || o.userData.halo) return;
+    o.material.emissive.set(colour ?? 0x000000);
+    o.material.emissiveIntensity = colour ? 0.6 : 1;
+  });
+}
+
+// "Power on": picture on the screen, backlight LEDs lit, diffuser glowing.
+function applyPower() {
+  const on = document.getElementById("power").checked;
+  if (screen) screen.userData.setPower(on);
+  const glow = (name, colour, intensity) => {
+    const p = byName.get(name);
+    if (!p || !p.mesh) return;
+    p.mesh.material.emissive.set(on ? colour : 0x000000);
+    p.mesh.material.emissiveIntensity = on ? intensity : 1;
+  };
+  glow("led_chips", 0xfff0c8, 6);
+  glow("diffuser_plate", 0xffffff, 0.55);
+  glow("reflector_sheet", 0xffffff, 0.18);
 }
 
 // ---- click to inspect ---------------------------------------------------------
@@ -739,19 +777,18 @@ function updateLabels() {
 function resize() {
   const { clientWidth: w, clientHeight: h } = stage;
   renderer.setSize(w, h);
+  look.resize(w, h);
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
 }
 new ResizeObserver(resize).observe(stage);
 resize();
 
-const offset = new THREE.Vector3();
 renderer.setAnimationLoop(() => {
   controls.update();
-  // Keep the main light over the viewer's shoulder so no side is ever dark.
-  offset.set(0.2, 0, 0.5).multiplyScalar(camera.position.distanceTo(controls.target));
-  key.position.copy(camera.position).add(offset);
-  renderer.render(scene, camera);
+  // The sideboard would block the view from behind the wall, so hide it there.
+  room.userData.furniture.visible = camera.position.y > 0;
+  look.render(controls.target);
   if (boards) updateLabels();
 });
 
