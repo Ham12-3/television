@@ -1,0 +1,6 @@
+# Python 3.12 recommended (build123d's CAD kernel wheels lag the newest Python).
+build123d==0.13.0     # parametric CAD (OpenCascade kernel), STEP / STL export
+trimesh==5.2.0        # mesh checks: watertightness, volume, wall thickness
+numpy==2.5.4
+scipy==1.18.1         # used by trimesh for nearest-point queries
+matplotlib==3.11.2    # PNG renders without needing a GPU or a window

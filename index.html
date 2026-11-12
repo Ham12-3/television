@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TV wall mount viewer</title>
+<!--
+  Local viewer for the TV wall mount.
+
+  It reads output/stl/manifest.json (written by export.py) and loads every STL
+  listed there, so new or renamed parts show up without editing this file.
+
+  Browsers block file loading from a page opened by double-click, so serve the
+  project folder first:
+
+      python -m http.server 5173 --bind 127.0.0.1
+      then open http://localhost:5173/
+
+  three.js is loaded from a CDN (pinned version), so the first load needs
+  internet access.
+-->
+<style>
+  :root {
+    --bg: #f4f4f2; --panel: #ffffff; --text: #1d1d1f; --muted: #6b6b70;
+    --line: #dcdcd8; --accent: #c4621a; --button: #ececea;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17171a; --panel: #222226; --text: #ececee; --muted: #9a9aa2;
+      --line: #36363c; --accent: #f08a3c; --button: #2e2e33;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+    display: flex; overflow: hidden;
+  }
+  #panel {
+    width: 290px; flex: none; background: var(--panel);
+    border-right: 1px solid var(--line); padding: 16px; overflow-y: auto;
+  }
+  #stage { flex: 1; position: relative; min-width: 0; }
+  canvas { display: block; }
+  h1 { font-size: 16px; margin: 0 0 2px; }
+  h2 {
+    font-size: 11px; font-weight: 600; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--muted); margin: 20px 0 8px;
+  }
+  .sub { color: var(--muted); font-size: 12px; margin: 0; }
+  .part {
+    display: grid; grid-template-columns: auto 14px 1fr; gap: 8px;
+    align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line);
+    cursor: pointer;
+  }
+  .part:last-child { border-bottom: 0; }
+  .swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--line); }
+  .part small { display: block; color: var(--muted); font-size: 11px; }
+  .row { display: flex; gap: 6px; flex-wrap: wrap; }
+  button {
+    font: inherit; color: var(--text); background: var(--button);
+    border: 1px solid var(--line); border-radius: 6px; padding: 5px 10px; cursor: pointer;
+  }
+  button:hover { border-color: var(--accent); }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  input[type=checkbox] { accent-color: var(--accent); margin: 0; }
+  label.opt { display: flex; gap: 8px; align-items: center; padding: 3px 0; cursor: pointer; }
+  #hint {
+    position: absolute; left: 12px; bottom: 10px; color: var(--muted);
+    font-size: 12px; pointer-events: none;
+  }
+  #error {
+    position: absolute; inset: 0; display: none; align-items: center;
+    justify-content: center; padding: 24px; text-align: center;
+  }
+  #error div { max-width: 460px; }
+  code { background: var(--button); padding: 1px 5px; border-radius: 4px; }
+  @media (max-width: 640px) {
+    body { flex-direction: column-reverse; }
+    #panel { width: 100%; max-height: 45%; border-right: 0; border-top: 1px solid var(--line); }
+  }
+</style>
+</head>
+<body>
+
+<aside id="panel">
+  <h1>TV wall mount</h1>
+  <p class="sub">32 inch, VESA 100 x 100, printed PETG</p>
+
+  <h2>Parts</h2>
+  <div id="parts"></div>
+
+  <h2>View</h2>
+  <div class="row">
+    <button data-view="front">Front</button>
+    <button data-view="back">Back</button>
+    <button data-view="side">Side</button>
+    <button data-view="top">Top</button>
+    <button data-view="iso">Iso</button>
+  </div>
+
+  <h2>Explode</h2>
+  <input id="explode" type="range" min="0" max="1" step="0.01" value="0" aria-label="Explode amount">
+
+  <h2>Display</h2>
+  <label class="opt"><input id="realColour" type="checkbox"> Real colour (matte black)</label>
+  <label class="opt"><input id="edges" type="checkbox" checked> Show edges</label>
+  <label class="opt"><input id="wall" type="checkbox" checked> Show wall</label>
+
+  <h2>Totals</h2>
+  <p class="sub" id="totals"></p>
+</aside>
+
+<main id="stage">
+  <div id="hint">Drag to rotate, scroll to zoom, right-drag to pan</div>
+  <div id="error"><div>
+    <p><strong>Could not load the model.</strong></p>
+    <p id="errorText" class="sub"></p>
+    <p class="sub">Run <code>python export.py</code>, then <code>python -m http.server 5173 --bind 127.0.0.1</code>
+      in the project folder and open <code>http://localhost:5173/</code>.</p>
+  </div></div>
+</main>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { STLLoader } from "three/addons/loaders/STLLoader.js";
+
+const STL_FOLDER = "output/stl/";
+
+// How far each kind of part moves at full explode, in mm (x, y, z).
+// The model is Z-up: X along the wall, Y out from the wall, Z up.
+const EXPLODE = {
+  wall_plate: [0, 0, 0],
+  tv_plate: [0, 60, 0],
+  lock_clip: [0, 20, -40],
+  cable_clip: [0, 20, -40],
+};
+const REAL_COLOUR = 0x1b1b1d;
+
+const stage = document.getElementById("stage");
+const dark = matchMedia("(prefers-color-scheme: dark)");
+
+// ---- scene ---------------------------------------------------------------
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+stage.prepend(renderer.domElement);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(35, 1, 1, 5000);
+camera.up.set(0, 0, 1);                       // CAD convention: Z is up
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x555560, 1.6));
+const key = new THREE.DirectionalLight(0xffffff, 2.0);
+scene.add(key);                               // moved with the camera each frame
+
+// A translucent sheet standing in for the wall, at Y = 0.
+const wall = new THREE.Mesh(
+  new THREE.PlaneGeometry(420, 320),
+  new THREE.MeshBasicMaterial({ color: 0x8a8a90, transparent: true, opacity: 0.12,
+                                side: THREE.DoubleSide, depthWrite: false }));
+wall.rotation.x = Math.PI / 2;                // plane now lies in X-Z
+wall.position.y = -0.2;
+scene.add(wall);
+
+function applyTheme() {
+  scene.background = new THREE.Color(dark.matches ? 0x17171a : 0xf4f4f2);
+}
+dark.addEventListener("change", applyTheme);
+applyTheme();
+
+// ---- parts ---------------------------------------------------------------
+const parts = [];                             // { entry, group, mesh, edges, colour }
+const centre = new THREE.Vector3();
+let radius = 150;
+
+const kindOf = (name) => name.replace(/_\d+$/, "");
+
+async function loadModel() {
+  const response = await fetch(STL_FOLDER + "manifest.json");
+  if (!response.ok) throw new Error("manifest.json not found (HTTP " + response.status + ")");
+  const manifest = await response.json();
+  const loader = new STLLoader();
+
+  await Promise.all(manifest.parts.map(async (entry) => {
+    const geometry = await loader.loadAsync(STL_FOLDER + entry.file);
+    geometry.computeVertexNormals();
+    const colour = new THREE.Color().setRGB(...entry.colour, THREE.SRGBColorSpace);
+    const mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
+      color: colour, roughness: 0.75, metalness: 0.0 }));
+    // Outline sharp edges so shapes read clearly even when everything is black.
+    const edges = new THREE.LineSegments(
+      new THREE.EdgesGeometry(geometry, 30),
+      new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.45 }));
+    const group = new THREE.Group();
+    group.add(mesh, edges);
+    scene.add(group);
+    parts.push({ entry, group, mesh, edges, colour });
+  }));
+
+  // Keep the manifest order in the list.
+  parts.sort((a, b) => manifest.parts.indexOf(a.entry) - manifest.parts.indexOf(b.entry));
+
+  const box = new THREE.Box3();
+  parts.forEach((p) => box.expandByObject(p.group));
+  box.getCenter(centre);
+  radius = box.getSize(new THREE.Vector3()).length() / 2;
+
+  buildPartList();
+  setView("iso");
+}
+
+function buildPartList() {
+  const list = document.getElementById("parts");
+  let mass = 0;
+  for (const p of parts) {
+    mass += p.entry.mass_g;
+    const row = document.createElement("label");
+    row.className = "part";
+    const [sx, sy, sz] = p.entry.size_mm.map((v) => v.toFixed(0));
+    row.innerHTML = `
+      <input type="checkbox" checked>
+      <span class="swatch" style="background:#${p.colour.getHexString()}"></span>
+      <span>${p.entry.name}<small>${sx} x ${sy} x ${sz} mm, ${p.entry.mass_g} g</small></span>`;
+    row.querySelector("input").addEventListener("change", (e) => {
+      p.group.visible = e.target.checked;
+    });
+    list.append(row);
+  }
+  document.getElementById("totals").textContent =
+    `${parts.length} printed parts, ${mass.toFixed(0)} g of PETG at 100 percent infill`;
+}
+
+// ---- controls ------------------------------------------------------------
+const VIEWS = {                               // direction from model to camera
+  front: [0, 1, 0],                           // from the room, looking at the wall
+  back: [0, -1, 0],
+  side: [1, 0, 0],
+  top: [0, 0.001, 1],                         // tiny Y so "up" stays defined
+  iso: [0.75, 1, 0.5],
+};
+
+function setView(name) {
+  const direction = new THREE.Vector3(...VIEWS[name]).normalize();
+  const distance = radius / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.15;
+  controls.target.copy(centre);
+  camera.position.copy(centre).addScaledVector(direction, distance);
+  controls.update();
+}
+document.querySelectorAll("[data-view]").forEach((button) =>
+  button.addEventListener("click", () => setView(button.dataset.view)));
+
+document.getElementById("explode").addEventListener("input", (e) => {
+  const amount = Number(e.target.value);
+  for (const p of parts) {
+    const [x, y, z] = EXPLODE[kindOf(p.entry.name)] ?? [0, 0, 0];
+    p.group.position.set(x * amount, y * amount, z * amount);
+  }
+});
+
+document.getElementById("realColour").addEventListener("change", (e) => {
+  for (const p of parts) {
+    p.mesh.material.color.copy(e.target.checked ? new THREE.Color(REAL_COLOUR) : p.colour);
+    // Light edges on black parts, dark edges on coloured parts.
+    p.edges.material.color.set(e.target.checked ? 0x9a9aa2 : 0x000000);
+  }
+});
+document.getElementById("edges").addEventListener("change", (e) => {
+  parts.forEach((p) => { p.edges.visible = e.target.checked; });
+});
+document.getElementById("wall").addEventListener("change", (e) => {
+  wall.visible = e.target.checked;
+});
+
+// ---- render loop ---------------------------------------------------------
+function resize() {
+  const { clientWidth: w, clientHeight: h } = stage;
+  renderer.setSize(w, h);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(stage);
+resize();
+
+renderer.setAnimationLoop(() => {
+  controls.update();
+  // Keep the main light over the viewer's shoulder so no side is ever dark.
+  key.position.copy(camera.position).add(new THREE.Vector3(80, 0, 160));
+  renderer.render(scene, camera);
+});
+
+loadModel().catch((err) => {
+  document.getElementById("errorText").textContent = String(err.message || err);
+  document.getElementById("error").style.display = "flex";
+});
+</script>
+</body>
+</html>

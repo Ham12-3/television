@@ -1,0 +1,96 @@
+{
+  "units": "mm",
+  "up_axis": "Z",
+  "parts": [
+    {
+      "name": "wall_plate",
+      "file": "wall_plate.stl",
+      "colour": [
+        0.16,
+        0.16,
+        0.18
+      ],
+      "size_mm": [
+        160.0,
+        17.7,
+        130.0
+      ],
+      "volume_mm3": 126299.7,
+      "mass_g": 160.4,
+      "print_file": "../stl_print/wall_plate.stl",
+      "print_rotation_x_deg": 90
+    },
+    {
+      "name": "tv_plate",
+      "file": "tv_plate.stl",
+      "colour": [
+        0.3,
+        0.3,
+        0.33
+      ],
+      "size_mm": [
+        140.0,
+        17.7,
+        140.0
+      ],
+      "volume_mm3": 113141.2,
+      "mass_g": 143.7,
+      "print_file": "../stl_print/tv_plate.stl",
+      "print_rotation_x_deg": -90
+    },
+    {
+      "name": "lock_clip",
+      "file": "lock_clip.stl",
+      "colour": [
+        0.9,
+        0.45,
+        0.1
+      ],
+      "size_mm": [
+        50.0,
+        8.0,
+        42.78
+      ],
+      "volume_mm3": 5670.1,
+      "mass_g": 7.2,
+      "print_file": "../stl_print/lock_clip.stl",
+      "print_rotation_x_deg": 90
+    },
+    {
+      "name": "cable_clip_1",
+      "file": "cable_clip_1.stl",
+      "colour": [
+        0.2,
+        0.5,
+        0.8
+      ],
+      "size_mm": [
+        16.8,
+        16.8,
+        30.18
+      ],
+      "volume_mm3": 2099.3,
+      "mass_g": 2.7,
+      "print_file": "../stl_print/cable_clip.stl",
+      "print_rotation_x_deg": 90
+    },
+    {
+      "name": "cable_clip_2",
+      "file": "cable_clip_2.stl",
+      "colour": [
+        0.2,
+        0.5,
+        0.8
+      ],
+      "size_mm": [
+        16.8,
+        16.8,
+        30.18
+      ],
+      "volume_mm3": 2099.3,
+      "mass_g": 2.7,
+      "print_file": "../stl_print/cable_clip.stl",
+      "print_rotation_x_deg": 90
+    }
+  ]
+}
