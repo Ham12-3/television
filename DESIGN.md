@@ -1,8 +1,12 @@
 # Design brief: 3D-printed fixed TV wall mount (32", VESA 100x100)
 
+This document covers the **wall mount** only. The television it carries is
+described in [TV_DESIGN.md](TV_DESIGN.md) and [ELECTRICAL.md](ELECTRICAL.md).
+
 Status: **complete as a design, unproven as a product** (step 8). `validate.py`
-passes all 91 checks, including the strength hand calculation in section 8
-(lowest safety factor 6.2). Nothing has been printed or load-tested. Every number below is a named parameter in `config.py`. Anything marked **[A#]** is an assumption
+passes all 120 checks, including the strength hand calculation in section 8
+(lowest safety factor 6.2) and a check against the modelled TV's mass and
+centre of mass. Nothing has been printed or load-tested. Every number below is a named parameter in `config.py`. Anything marked **[A#]** is an assumption
 I made because it was not specified; see the assumptions table.
 
 ## 1. Purpose
@@ -79,7 +83,7 @@ Coordinates: X = left/right, Z = up, Y = out from the wall.
 | Lower rail blocks | 2x, 43 x 8 mm, 34 mm notch between | Bumper, clip stop and cable-clip mounts |
 | Wall-to-TV stack | 24 mm | 6 mm plate + 12 mm air gap + 6 mm plate |
 | Wall screw holes | 4x, 5.5 mm clearance, countersunk | For 5 mm wood screws **[A3]** |
-| Wall screw spacing | 120 x 90 mm | Close to the cleat to limit plate bending. Hidden behind the TV plate once the TV is hung |
+| Wall screw spacing | 110 x 90 mm | Close to the cleat to limit plate bending. Hidden behind the TV plate once the TV is hung |
 | Cable window | 70 x 40 mm, through both plates | Centred, corners rounded to 8 mm |
 | Vent slots | 6 mm wide, 3 mm ribs between | In the non-loaded areas of both plates only |
 | Outer corner radius | 10 mm | |
@@ -148,7 +152,7 @@ the cleat.
 | Typical 32" TV mass | 4 to 6 kg |
 | **Rated maximum TV mass** | **8 kg** **[A1]** |
 | Design load | 8 kg x 9.81 = 78.5 N, static, vertical |
-| Load offset from the wall | About 50 mm (bracket depth plus half the TV depth) **[A2]** |
+| Load offset from the wall | 70 mm assumed; the modelled TV's centre of mass is 64.8 mm out **[A2]** |
 | PETG tensile yield, in-plane, printed | 40 MPa (datasheet values run 45 to 50 MPa) |
 | PETG strength between layers | 20 MPa (about 50 percent of in-plane) |
 | Long-term (creep) allowable stress | 8 MPa, about 20 percent of yield |
@@ -193,8 +197,8 @@ it proves awkward, lengthen `LOCK_CLIP_PULL_HEIGHT` in `config.py`.
 
 | ID | Assumption | Why it matters | How to check |
 |----|------------|----------------|--------------|
-| A1 | TV weighs 8 kg or less without its stand | Sets every strength result | TV manual or spec sheet |
-| A2 | TV is under 60 mm deep, centre of mass about 50 mm from the wall | Sets the overturning moment on the wall screws | Measure the TV |
+| A1 | TV weighs 8 kg or less without its stand (the modelled TV is about 5.7 kg) | Sets every strength result | TV manual or spec sheet |
+| A2 | TV is 70 mm deep, centre of mass no more than 70 mm from the wall | Sets the overturning moment on the wall screws | Measure the TV |
 | A3 | Wall takes 5 mm wood screws: timber stud, or masonry with plugs | Plain plasterboard alone is **not** acceptable for the upper screws | Find the studs or wall type |
 | A4 | VESA threads are M4 with at least 10 mm usable depth, and the TV back is flat around the holes | Wrong screw length can damage the TV or leave the plate loose | TV manual; measure hole depth |
 | A5 | No ports or vents sit directly behind the 140 x 140 mm TV plate area | The plate would block them | Look at the back of the TV |
@@ -225,13 +229,13 @@ These are typical printed-PETG figures, not measurements of your filament.
 
 ### 8.2 Loads
 
-- Weight: W = 8 kg x 9.81 = **78.5 N**, straight down, 50 mm from the wall.
+- Weight: W = 8 kg x 9.81 = **78.5 N**, straight down, 70 mm from the wall.
 - Cleat, treated as a frictionless 45 degree wedge (worst case for the cleat):
   vertical V = 78.5 N, horizontal H = V / tan 45 = 78.5 N,
   normal force on the slope N = 111 N.
-- Overturning: the weight acts 38 mm in front of the cleat contact, and the
+- Overturning: the weight acts 58 mm in front of the cleat contact, and the
   lower rail is 103 mm below it, so the lower rail pushes back with
-  B = 78.5 x 38 / 103 = **29.0 N**. The same 29.0 N is the net pull on the wall
+  B = 78.5 x 58 / 103 = **44.2 N**. The same 44.2 N is the net pull on the wall
   at the cleat.
 
 ### 8.3 Load paths
@@ -241,11 +245,11 @@ These are typical printed-PETG figures, not measurements of your filament.
 | 1 | Bearing on the cleat slope | 111 N over 9.3 x 80 = 747 mm2 | 0.15 MPa | 8.0 | 54 |
 | 2 | **Cleat root, bending + tension** | M = 78.5 x 6 + 78.5 x 13 = 1491 N.mm; Z = 80 x 14^2 / 6 = 2613 mm3; 0.57 + 78.5 / 1120 | **0.64 MPa** | 4.0 (between layers) | **6.2** |
 | 3 | Cleat root, shear | 78.5 N over 80 x 14 = 1120 mm2 | 0.07 MPa | 2.0 | 29 |
-| 4 | Wall plate bending at the end of the rail | M = 29.0 / 2 x 20 = 290 N.mm; Z = 45 x 6^2 / 6 = 270 mm3 | 1.07 MPa | 8.0 | 7.5 |
+| 4 | Wall plate bending at the end of the rail | M = 44.2 / 2 x 15 = 331 N.mm; Z = 45 x 6^2 / 6 = 270 mm3 | 1.23 MPa | 8.0 | 6.5 |
 | 5 | VESA hole bearing, 4 screws sharing | 19.6 N over 4 x 6 = 24 mm2 | 0.82 MPa | 8.0 | 9.8 |
-| 6 | VESA screw head on the plate | 10.2 N tension per top screw over 21 mm2 | 0.48 MPa | 8.0 | 17 |
+| 6 | VESA screw head on the plate | 18.1 N tension per top screw over 21 mm2 | 0.85 MPa | 8.0 | 9.4 |
 | 7 | Wall screw hole bearing, 4 sharing | 19.6 N over 5 x 6 = 30 mm2 | 0.65 MPa | 8.0 | 12 |
-| 8 | Wall screw head in the countersink | 17.3 N pull-out per top screw over 53 mm2 | 0.33 MPa | 8.0 | 25 |
+| 8 | Wall screw head in the countersink | 24.2 N pull-out per top screw over 53 mm2 | 0.46 MPa | 8.0 | 17 |
 
 Notes on the rows:
 
@@ -254,7 +258,7 @@ Notes on the rows:
   between-layer allowable is used.
 - **Row 4** treats the strip of plate above the cable window (45 mm tall) as a
   beam between the two top wall screws. The rail stiffens the middle, so the
-  critical section is where the rail ends, 20 mm from the screws.
+  critical section is where the rail ends, 15 mm from the screws.
 - **Rows 5 and 7** assume the screws share the load equally.
 
 ### 8.4 Pessimistic cases
@@ -269,7 +273,7 @@ tightened screws carries most of this load, but that is not relied on here.
 
 ### 8.5 Wall fixings
 
-Each top wall screw sees about 19.6 N in shear and 17.3 N in pull-out. A 5 mm
+Each top wall screw sees about 19.6 N in shear and 24.2 N in pull-out. A 5 mm
 wood screw with 30 mm or more in a timber stud, or a 6 mm plug in solid
 masonry, holds many times that. **A plain plug in plasterboard does not have a
 dependable margin**; use the studs or proper cavity anchors. The wall fixing is
@@ -283,7 +287,12 @@ target, and the design was changed:
 | Load path | Before | Change | After |
 |-----------|--------|--------|-------|
 | Cleat root | 3.6 | Root height 10 mm to 14 mm; cable window shortened from 50 mm to 40 mm to make room | 6.2 |
-| Wall plate bending | 3.9 | Wall screws moved in from 150 mm to 120 mm spacing; plate narrowed from 180 mm to 160 mm | 7.5 |
+| Wall plate bending | 3.9 | Wall screws moved in from 150 mm to 110 mm spacing; plate narrowed from 180 mm to 160 mm | 6.5 |
+
+The wall screws were moved twice. The first move (to 120 mm) gave 7.5 with the
+TV's weight assumed 50 mm from the wall. Once the whole TV was modelled, its
+centre of mass turned out to be 65 mm out; with 70 mm assumed the factor fell
+to 4.9, so the screws moved in again to 110 mm.
 
 An earlier note in this document said the cleat root saw "well under 1 MPa"
 with a 10 mm root. That was wrong: it left out the horizontal wedge force.
@@ -304,14 +313,14 @@ with a 10 mm root. That was wrong: it left out the horizontal wedge force.
 5. **Static load only.** No allowance for someone leaning on or bumping the TV,
    for vibration, or for impact.
 6. **The wall is not checked.**
-7. **Rated for 8 kg and a centre of mass within 50 mm of the wall.** A heavier
+7. **Rated for 8 kg and a centre of mass within 70 mm of the wall.** A heavier
    or deeper TV scales the stresses up directly.
 
 ### 8.8 What must be checked by real testing or FEA
 
 | Check | How | Pass criterion |
 |-------|-----|----------------|
-| **Proof load (do this before hanging a TV)** | Mount both plates as intended, hang 24 kg (3 x rated) from the TV plate at about 50 mm from the wall, leave for 48 hours | No cracks, whitening, layer separation or visible sag; plates still parallel |
+| **Proof load (do this before hanging a TV)** | Mount both plates as intended, hang 24 kg (3 x rated) from the TV plate at about 70 mm from the wall, leave for 48 hours | No cracks, whitening, layer separation or visible sag; plates still parallel |
 | Creep | Leave 8 to 10 kg hanging for 2 weeks, measure the gap at the bottom of the plates at the start and end | Change under 0.5 mm |
 | Cleat groove stress | FEA with orthotropic (layered) material properties, contact at the slope | Peak stress within the between-layer allowable |
 | Snap-fit clips | Insert and remove each clip 20 times | No whitening or cracks at the arm roots; clip still clicks |

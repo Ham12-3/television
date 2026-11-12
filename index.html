@@ -3,9 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TV wall mount viewer</title>
+<title>Television viewer</title>
 <!--
-  Local viewer for the TV wall mount.
+  Local viewer for the complete television: enclosure, panel, backlight,
+  chassis, circuit boards, cables, wall mount, stand feet and remote.
 
   It reads output/stl/manifest.json (written by export.py) and loads every STL
   listed there, so new or renamed parts show up without editing this file.
@@ -26,8 +27,8 @@
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #17171a; --panel: #222226; --text: #ececee; --muted: #9a9aa2;
-      --line: #36363c; --accent: #f08a3c; --button: #2e2e33;
+      --bg: #1c1d21; --panel: #25262b; --text: #ececee; --muted: #9a9aa2;
+      --line: #393a41; --accent: #f08a3c; --button: #31323a;
     }
   }
   * { box-sizing: border-box; }
@@ -38,7 +39,7 @@
     display: flex; overflow: hidden;
   }
   #panel {
-    width: 290px; flex: none; background: var(--panel);
+    width: 320px; flex: none; background: var(--panel);
     border-right: 1px solid var(--line); padding: 16px; overflow-y: auto;
   }
   #stage { flex: 1; position: relative; min-width: 0; }
@@ -46,50 +47,65 @@
   h1 { font-size: 16px; margin: 0 0 2px; }
   h2 {
     font-size: 11px; font-weight: 600; letter-spacing: .06em;
-    text-transform: uppercase; color: var(--muted); margin: 20px 0 8px;
+    text-transform: uppercase; color: var(--muted); margin: 18px 0 8px;
   }
   .sub { color: var(--muted); font-size: 12px; margin: 0; }
-  .part {
-    display: grid; grid-template-columns: auto 14px 1fr; gap: 8px;
-    align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line);
-    cursor: pointer;
-  }
-  .part:last-child { border-bottom: 0; }
-  .swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--line); }
-  .part small { display: block; color: var(--muted); font-size: 11px; }
   .row { display: flex; gap: 6px; flex-wrap: wrap; }
   button {
     font: inherit; color: var(--text); background: var(--button);
     border: 1px solid var(--line); border-radius: 6px; padding: 5px 10px; cursor: pointer;
   }
   button:hover { border-color: var(--accent); }
+  button.on { border-color: var(--accent); color: var(--accent); }
   input[type=range] { width: 100%; accent-color: var(--accent); }
-  input[type=checkbox] { accent-color: var(--accent); margin: 0; }
+  input[type=checkbox] { accent-color: var(--accent); margin: 0; flex: none; }
   label.opt { display: flex; gap: 8px; align-items: center; padding: 3px 0; cursor: pointer; }
-  #hint {
-    position: absolute; left: 12px; bottom: 10px; color: var(--muted);
-    font-size: 12px; pointer-events: none;
+
+  details.group { border-bottom: 1px solid var(--line); }
+  details.group > summary {
+    display: flex; gap: 8px; align-items: center; padding: 7px 0; cursor: pointer;
+    list-style: none; font-weight: 600;
   }
+  details.group > summary::-webkit-details-marker { display: none; }
+  details.group > summary .name { flex: 1; }
+  details.group > summary .count { color: var(--muted); font-weight: 400; font-size: 12px; }
+  details.group > summary::after { content: "+"; color: var(--muted); width: 10px; text-align: center; }
+  details.group[open] > summary::after { content: "\2212"; }
+  .part {
+    display: grid; grid-template-columns: auto 12px 1fr; gap: 8px;
+    align-items: center; padding: 3px 0 3px 22px; cursor: pointer; font-size: 13px;
+  }
+  .part small { display: block; color: var(--muted); font-size: 11px; }
+  .swatch { width: 12px; height: 12px; border-radius: 3px; border: 1px solid var(--line); }
+  #hint { position: absolute; left: 12px; bottom: 10px; color: var(--muted); font-size: 12px; pointer-events: none; }
+  #status { position: absolute; right: 12px; bottom: 10px; color: var(--muted); font-size: 12px; }
   #error {
     position: absolute; inset: 0; display: none; align-items: center;
     justify-content: center; padding: 24px; text-align: center;
   }
   #error div { max-width: 460px; }
   code { background: var(--button); padding: 1px 5px; border-radius: 4px; }
-  @media (max-width: 640px) {
+  @media (max-width: 700px) {
     body { flex-direction: column-reverse; }
-    #panel { width: 100%; max-height: 45%; border-right: 0; border-top: 1px solid var(--line); }
+    #panel { width: 100%; max-height: 48%; border-right: 0; border-top: 1px solid var(--line); }
   }
 </style>
 </head>
 <body>
 
 <aside id="panel">
-  <h1>TV wall mount</h1>
-  <p class="sub">32 inch, VESA 100 x 100, printed PETG</p>
+  <h1>32 inch LED television</h1>
+  <p class="sub" id="summary">Loading the model ...</p>
 
-  <h2>Parts</h2>
-  <div id="parts"></div>
+  <h2>Show</h2>
+  <div class="row" id="presets">
+    <button data-preset="all">Whole TV</button>
+    <button data-preset="inside">Back cover off</button>
+    <button data-preset="boards">Boards only</button>
+    <button data-preset="backlight">Backlight</button>
+    <button data-preset="mount">Wall mount</button>
+    <button data-preset="remote">Remote</button>
+  </div>
 
   <h2>View</h2>
   <div class="row">
@@ -97,23 +113,24 @@
     <button data-view="back">Back</button>
     <button data-view="side">Side</button>
     <button data-view="top">Top</button>
-    <button data-view="iso">Iso</button>
+    <button data-view="iso">Front 3/4</button>
+    <button data-view="isoBack">Back 3/4</button>
   </div>
 
   <h2>Explode</h2>
   <input id="explode" type="range" min="0" max="1" step="0.01" value="0" aria-label="Explode amount">
 
+  <h2>Parts</h2>
+  <div id="groups"></div>
+
   <h2>Display</h2>
-  <label class="opt"><input id="realColour" type="checkbox"> Real colour (matte black)</label>
   <label class="opt"><input id="edges" type="checkbox" checked> Show edges</label>
   <label class="opt"><input id="wall" type="checkbox" checked> Show wall</label>
-
-  <h2>Totals</h2>
-  <p class="sub" id="totals"></p>
 </aside>
 
 <main id="stage">
   <div id="hint">Drag to rotate, scroll to zoom, right-drag to pan</div>
+  <div id="status"></div>
   <div id="error"><div>
     <p><strong>Could not load the model.</strong></p>
     <p id="errorText" class="sub"></p>
@@ -137,147 +154,231 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { STLLoader } from "three/addons/loaders/STLLoader.js";
 
 const STL_FOLDER = "output/stl/";
-
-// How far each kind of part moves at full explode, in mm (x, y, z).
-// The model is Z-up: X along the wall, Y out from the wall, Z up.
-const EXPLODE = {
-  wall_plate: [0, 0, 0],
-  tv_plate: [0, 60, 0],
-  lock_clip: [0, 20, -40],
-  cable_clip: [0, 20, -40],
-};
-const REAL_COLOUR = 0x1b1b1d;
-
 const stage = document.getElementById("stage");
+const statusLine = document.getElementById("status");
 const dark = matchMedia("(prefers-color-scheme: dark)");
 
 // ---- scene ---------------------------------------------------------------
+// The model is Z-up: X along the wall, Y out from the wall, Z up.
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 stage.prepend(renderer.domElement);
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(35, 1, 1, 5000);
-camera.up.set(0, 0, 1);                       // CAD convention: Z is up
+const camera = new THREE.PerspectiveCamera(32, 1, 5, 20000);
+camera.up.set(0, 0, 1);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 
-scene.add(new THREE.HemisphereLight(0xffffff, 0x555560, 1.6));
+scene.add(new THREE.HemisphereLight(0xffffff, 0x666670, 1.7));
 const key = new THREE.DirectionalLight(0xffffff, 2.0);
-scene.add(key);                               // moved with the camera each frame
+scene.add(key);                               // follows the camera, see the render loop
 
 // A translucent sheet standing in for the wall, at Y = 0.
 const wall = new THREE.Mesh(
-  new THREE.PlaneGeometry(420, 320),
-  new THREE.MeshBasicMaterial({ color: 0x8a8a90, transparent: true, opacity: 0.12,
+  new THREE.PlaneGeometry(1100, 700),
+  new THREE.MeshBasicMaterial({ color: 0x8a8a90, transparent: true, opacity: 0.10,
                                 side: THREE.DoubleSide, depthWrite: false }));
-wall.rotation.x = Math.PI / 2;                // plane now lies in X-Z
-wall.position.y = -0.2;
+wall.rotation.x = Math.PI / 2;
+wall.position.y = -0.3;
 scene.add(wall);
 
 function applyTheme() {
-  scene.background = new THREE.Color(dark.matches ? 0x17171a : 0xf4f4f2);
+  scene.background = new THREE.Color(dark.matches ? 0x1c1d21 : 0xf4f4f2);
 }
 dark.addEventListener("change", applyTheme);
 applyTheme();
 
 // ---- parts ---------------------------------------------------------------
-const parts = [];                             // { entry, group, mesh, edges, colour }
+const parts = [];                             // { entry, group, mesh, edges, box }
+const byGroup = new Map();                    // group name -> parts
 const centre = new THREE.Vector3();
-let radius = 150;
-
-const kindOf = (name) => name.replace(/_\d+$/, "");
+let radius = 400;
 
 async function loadModel() {
   const response = await fetch(STL_FOLDER + "manifest.json");
   if (!response.ok) throw new Error("manifest.json not found (HTTP " + response.status + ")");
   const manifest = await response.json();
   const loader = new STLLoader();
+  let done = 0;
 
-  await Promise.all(manifest.parts.map(async (entry) => {
+  await Promise.all(manifest.parts.map(async (entry, index) => {
     const geometry = await loader.loadAsync(STL_FOLDER + entry.file);
     geometry.computeVertexNormals();
     const colour = new THREE.Color().setRGB(...entry.colour, THREE.SRGBColorSpace);
+    const seeThrough = (entry.opacity ?? 1) < 1;
     const mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
-      color: colour, roughness: 0.75, metalness: 0.0 }));
-    // Outline sharp edges so shapes read clearly even when everything is black.
+      color: colour, roughness: 0.7, metalness: 0.05,
+      transparent: seeThrough, opacity: entry.opacity ?? 1, depthWrite: !seeThrough }));
+    // Outline sharp edges so dark parts stay readable against each other.
     const edges = new THREE.LineSegments(
-      new THREE.EdgesGeometry(geometry, 30),
-      new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.45 }));
+      new THREE.EdgesGeometry(geometry, 35),
+      new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.35 }));
     const group = new THREE.Group();
     group.add(mesh, edges);
+    group.visible = entry.visible !== false;
     scene.add(group);
-    parts.push({ entry, group, mesh, edges, colour });
+    geometry.computeBoundingBox();
+    parts.push({ entry, group, mesh, edges, colour, index, box: geometry.boundingBox.clone() });
+    statusLine.textContent = `Loading ${++done} / ${manifest.parts.length}`;
   }));
+  statusLine.textContent = "";
 
-  // Keep the manifest order in the list.
-  parts.sort((a, b) => manifest.parts.indexOf(a.entry) - manifest.parts.indexOf(b.entry));
+  parts.sort((a, b) => a.index - b.index);    // keep the manifest order
+  for (const p of parts) {
+    if (!byGroup.has(p.entry.group)) byGroup.set(p.entry.group, []);
+    byGroup.get(p.entry.group).push(p);
+  }
 
-  const box = new THREE.Box3();
-  parts.forEach((p) => box.expandByObject(p.group));
-  box.getCenter(centre);
-  radius = box.getSize(new THREE.Vector3()).length() / 2;
-
-  buildPartList();
+  buildPartTree();
+  if (manifest.tv) {
+    const tv = manifest.tv;
+    document.getElementById("summary").textContent =
+      `${tv.size_mm[0]} x ${tv.size_mm[2]} x ${tv.size_mm[1]} mm, about ${tv.mass_kg} kg, ` +
+      `${parts.length} items. Reference design, not a real product.`;
+  }
+  applyPreset("all");
   setView("iso");
 }
 
-function buildPartList() {
-  const list = document.getElementById("parts");
-  let mass = 0;
-  for (const p of parts) {
-    mass += p.entry.mass_g;
-    const row = document.createElement("label");
-    row.className = "part";
-    const [sx, sy, sz] = p.entry.size_mm.map((v) => v.toFixed(0));
-    row.innerHTML = `
-      <input type="checkbox" checked>
-      <span class="swatch" style="background:#${p.colour.getHexString()}"></span>
-      <span>${p.entry.name}<small>${sx} x ${sy} x ${sz} mm, ${p.entry.mass_g} g</small></span>`;
-    row.querySelector("input").addEventListener("change", (e) => {
-      p.group.visible = e.target.checked;
-    });
-    list.append(row);
-  }
-  document.getElementById("totals").textContent =
-    `${parts.length} printed parts, ${mass.toFixed(0)} g of PETG at 100 percent infill`;
+function label(name) {
+  return name.replace(/_/g, " ");
 }
 
-// ---- controls ------------------------------------------------------------
-const VIEWS = {                               // direction from model to camera
-  front: [0, 1, 0],                           // from the room, looking at the wall
-  back: [0, -1, 0],
+function buildPartTree() {
+  const root = document.getElementById("groups");
+  for (const [groupName, members] of byGroup) {
+    const details = document.createElement("details");
+    details.className = "group";
+    details.dataset.group = groupName;
+    details.innerHTML = `
+      <summary>
+        <input type="checkbox">
+        <span class="name">${groupName}</span>
+        <span class="count">${members.length}</span>
+      </summary>`;
+    const master = details.querySelector("input");
+    master.addEventListener("click", (e) => e.stopPropagation());   // do not fold the group
+    master.addEventListener("change", () => {
+      members.forEach((p) => setVisible(p, master.checked));
+      frame();
+    });
+
+    for (const p of members) {
+      const row = document.createElement("label");
+      row.className = "part";
+      const [sx, sy, sz] = p.entry.size_mm.map((v) => v.toFixed(0));
+      const count = p.entry.count > 1 ? `${p.entry.count} pieces, ` : "";
+      const note = p.entry.note ? `<small>${p.entry.note}</small>` : "";
+      row.innerHTML = `
+        <input type="checkbox">
+        <span class="swatch" style="background:#${p.colour.getHexString()}"></span>
+        <span>${label(p.entry.name)}
+          <small>${count}${sx} x ${sy} x ${sz} mm, ${p.entry.mass_g} g</small>${note}</span>`;
+      p.checkbox = row.querySelector("input");
+      p.checkbox.addEventListener("change", () => {
+        setVisible(p, p.checkbox.checked);
+        frame();
+      });
+      details.append(row);
+    }
+    root.append(details);
+  }
+  syncCheckboxes();
+}
+
+function setVisible(p, on) {
+  p.group.visible = on;
+}
+
+function syncCheckboxes() {
+  for (const p of parts) p.checkbox.checked = p.group.visible;
+  for (const details of document.querySelectorAll("details.group")) {
+    const members = byGroup.get(details.dataset.group);
+    const shown = members.filter((p) => p.group.visible).length;
+    const master = details.querySelector("summary input");
+    master.checked = shown === members.length;
+    master.indeterminate = shown > 0 && shown < members.length;
+  }
+}
+
+// ---- presets: which parts are shown ---------------------------------------
+const BOARD_GROUPS = ["Main board", "Power supply board", "T-con board", "LED driver board",
+                      "Wi-Fi / Bluetooth module", "IR / LED / key board"];
+const PRESETS = {
+  // everything that is fitted, plus the remote
+  all: (p) => p.entry.group !== "Stand feet",
+  // rear cover and wall mount removed, so the boards are visible from the back
+  inside: (p) => !["Stand feet", "Wall mount", "Remote control"].includes(p.entry.group)
+                 && !["rear_cover", "cover_screws"].includes(p.entry.name),
+  boards: (p) => BOARD_GROUPS.includes(p.entry.group) || p.entry.group === "Cables",
+  backlight: (p) => ["back_chassis", "led_strips", "led_chips", "led_lenses", "reflector_sheet",
+                     "support_pins"].includes(p.entry.name),
+  mount: (p) => p.entry.group === "Wall mount",
+  remote: (p) => p.entry.group === "Remote control",
+};
+const PRESET_VIEW = { all: "iso", inside: "isoBack", boards: "back", backlight: "iso",
+                      mount: "isoBack", remote: "iso" };
+
+function applyPreset(name) {
+  parts.forEach((p) => setVisible(p, PRESETS[name](p)));
+  document.querySelectorAll("[data-preset]").forEach((b) =>
+    b.classList.toggle("on", b.dataset.preset === name));
+  syncCheckboxes();
+  frame();
+  setView(PRESET_VIEW[name]);
+}
+document.querySelectorAll("[data-preset]").forEach((button) =>
+  button.addEventListener("click", () => applyPreset(button.dataset.preset)));
+
+// ---- camera ----------------------------------------------------------------
+// Fit the camera to whatever is visible right now.
+function frame() {
+  const box = new THREE.Box3();
+  for (const p of parts) {
+    if (!p.group.visible) continue;
+    box.union(p.box.clone().translate(p.group.position));
+  }
+  if (box.isEmpty()) return;
+  box.getCenter(centre);
+  radius = Math.max(box.getSize(new THREE.Vector3()).length() / 2, 20);
+  syncCheckboxes();
+}
+
+const VIEWS = {                               // direction from the model to the camera
+  front: [0, 1, 0],                           // from the room, looking at the screen
+  back: [0, -1, 0],                           // from behind the wall
   side: [1, 0, 0],
   top: [0, 0.001, 1],                         // tiny Y so "up" stays defined
-  iso: [0.75, 1, 0.5],
+  iso: [-0.6, 1, 0.35],
+  isoBack: [0.6, -1, 0.35],
 };
+let currentView = "iso";
 
 function setView(name) {
+  currentView = name;
   const direction = new THREE.Vector3(...VIEWS[name]).normalize();
-  const distance = radius / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.15;
+  const distance = radius / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.05;
   controls.target.copy(centre);
   camera.position.copy(centre).addScaledVector(direction, distance);
+  camera.near = Math.max(distance / 500, 1);
+  camera.far = distance * 20;
+  camera.updateProjectionMatrix();
   controls.update();
 }
 document.querySelectorAll("[data-view]").forEach((button) =>
-  button.addEventListener("click", () => setView(button.dataset.view)));
+  button.addEventListener("click", () => { frame(); setView(button.dataset.view); }));
 
 document.getElementById("explode").addEventListener("input", (e) => {
   const amount = Number(e.target.value);
   for (const p of parts) {
-    const [x, y, z] = EXPLODE[kindOf(p.entry.name)] ?? [0, 0, 0];
+    const [x, y, z] = p.entry.explode ?? [0, 0, 0];
     p.group.position.set(x * amount, y * amount, z * amount);
   }
 });
+document.getElementById("explode").addEventListener("change", () => { frame(); setView(currentView); });
 
-document.getElementById("realColour").addEventListener("change", (e) => {
-  for (const p of parts) {
-    p.mesh.material.color.copy(e.target.checked ? new THREE.Color(REAL_COLOUR) : p.colour);
-    // Light edges on black parts, dark edges on coloured parts.
-    p.edges.material.color.set(e.target.checked ? 0x9a9aa2 : 0x000000);
-  }
-});
 document.getElementById("edges").addEventListener("change", (e) => {
   parts.forEach((p) => { p.edges.visible = e.target.checked; });
 });
@@ -295,10 +396,12 @@ function resize() {
 new ResizeObserver(resize).observe(stage);
 resize();
 
+const offset = new THREE.Vector3();
 renderer.setAnimationLoop(() => {
   controls.update();
   // Keep the main light over the viewer's shoulder so no side is ever dark.
-  key.position.copy(camera.position).add(new THREE.Vector3(80, 0, 160));
+  offset.set(0.2, 0, 0.5).multiplyScalar(camera.position.distanceTo(controls.target));
+  key.position.copy(camera.position).add(offset);
   renderer.render(scene, camera);
 });
 

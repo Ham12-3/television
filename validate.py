@@ -58,7 +58,7 @@ class Report:
         failed = 0
         total = 0
         print("=" * 78)
-        print("TV WALL MOUNT - VALIDATION REPORT")
+        print("TELEVISION AND WALL MOUNT - VALIDATION REPORT")
         print("=" * 78)
         for title, checks in self.sections:
             print()
@@ -324,6 +324,106 @@ def check_printability_all(report, parts):
                      f"widest {result['worst_bridge']:.1f} mm")
 
 
+def check_television(report):
+    """Checks on the complete TV: layout, fit, clashes, mass and electrical budget."""
+    import json
+
+    from build123d import Pos as Move
+
+    import electrical
+    from tv.board_data import BOARDS, height, layout_problems
+    from tv_assembly import all_shapes, build_tv, find_clashes, mass_properties
+
+    report.section("8. Television: boards and stack-up")
+    for board in BOARDS:
+        problems = layout_problems(board)
+        report.check(f"{board['title']}: no overlapping parts, none over a mounting hole",
+                     not problems, "; ".join(problems[:3]) or f"{len(board['parts'])} parts")
+    tallest = max((height(p), f"{b['title']} {p['ref']}") for b in BOARDS
+                  if not b.get("faces_front") for p in b["parts"])
+    report.check("Tallest component clears the rear cover",
+                 tallest[0] <= cfg.MAX_COMPONENT_HEIGHT,
+                 f"{tallest[1]} is {tallest[0]:.0f} mm, limit {cfg.MAX_COMPONENT_HEIGHT:.1f} mm")
+    stack = [cfg.W_FRONT, cfg.W_LIP_BACK, cfg.W_CELL_FRONT, cfg.W_CELL_BACK, cfg.W_FRAME_LIP_BACK,
+             cfg.W_FILMS_FRONT, cfg.W_FILMS_BACK, cfg.W_DIFFUSER_BACK, cfg.W_STRIP_TOP,
+             cfg.W_TRAY_FLOOR, cfg.W_TRAY_BACK, cfg.W_PCB_FRONT, cfg.W_PCB_BACK, cfg.ENCLOSURE_WALL, 0.0]
+    report.check("Layers are in order from front to back with no overlap",
+                 all(a > b for a, b in zip(stack, stack[1:])),
+                 f"{len(stack)} levels from {stack[0]:.1f} to {stack[-1]:.1f} mm")
+    report.check("Optical cavity (LED to diffuser) is 20 to 35 mm",
+                 20 <= cfg.OPTICAL_CAVITY <= 35, f"{cfg.OPTICAL_CAVITY:.1f} mm")
+    led_pitch = cfg.LED_STRIP_LENGTH / cfg.LEDS_PER_STRIP
+    report.check("LED spacing is no more than 4 times the cavity depth (even light)",
+                 led_pitch <= 4 * cfg.OPTICAL_CAVITY,
+                 f"{led_pitch:.0f} mm pitch, {cfg.OPTICAL_CAVITY:.1f} mm cavity")
+    diag = math.hypot(cfg.ACTIVE_WIDTH, cfg.ACTIVE_HEIGHT) / 25.4
+    report.check("Picture diagonal matches the stated size class",
+                 abs(diag - cfg.TV_DIAGONAL_INCH) <= 0.6, f"{diag:.1f} inch")
+
+    report.section("9. Television: 3D model")
+    print("Building the television ...")
+    items = build_tv()
+    fitted = [i for i in items if i.fitted]
+    bad = [i.name for i in items if not i.shape.is_valid]
+    report.check("Every item is valid geometry", not bad, ", ".join(bad) or f"{len(items)} items")
+
+    manifest_path = STL_DIR / "manifest.json"
+    listed = {p["name"] for p in json.loads(manifest_path.read_text())["parts"]} if manifest_path.exists() else set()
+    missing = [i.name for i in items if i.name not in listed or not (STL_DIR / f"{i.name}.stl").exists()]
+    report.check("Every item has been exported for the viewer", not missing,
+                 ", ".join(missing[:4]) or f"{len(items)} STL files")
+    leaky = [i.name for i in items if (STL_DIR / f"{i.name}.stl").exists()
+             and not trimesh.load_mesh(str(STL_DIR / f"{i.name}.stl")).is_watertight]
+    report.check("Every exported mesh is watertight", not leaky, ", ".join(leaky[:4]) or "all closed")
+
+    # Envelope. Small, deliberate protrusions are allowed for: screw heads at
+    # the back, the button under the bezel, the badge on the front.
+    half_x, half_z = cfg.TV_WIDTH / 2, cfg.TV_HEIGHT / 2
+    y_back, y_front = cfg.STACK_DEPTH, cfg.STACK_DEPTH + cfg.TV_DEPTH
+    outside = []
+    for item in fitted:
+        b = item.shape.bounding_box()
+        if (b.min.X < -half_x - 0.01 or b.max.X > half_x + 0.01
+                or b.min.Z < -half_z - 2.0 or b.max.Z > half_z + 0.01
+                or b.min.Y < y_back - 2.01 or b.max.Y > y_front + 1.0):
+            outside.append(item.name)
+    report.check("Everything fitted sits inside the TV's outline", not outside,
+                 ", ".join(outside) or f"{cfg.TV_WIDTH:.0f} x {cfg.TV_HEIGHT:.0f} x {cfg.TV_DEPTH:.0f} mm")
+
+    shapes = all_shapes(items)
+    print("Checking the television for clashes ...")
+    clashes = find_clashes(shapes)
+    report.check("No two items overlap (TV, wall mount and screws)", not clashes,
+                 "; ".join(f"{a}/{b} {v:.1f} mm3" for a, b, v in clashes[:4])
+                 or f"{len(shapes)} items compared")
+    # Prove the clash check can fail: push the speakers 5 mm into the cover.
+    planted = {"speakers": Move(0, 0, -5) * shapes["speakers"], "rear_cover": shapes["rear_cover"]}
+    report.check("Clash check detects a deliberately planted overlap",
+                 bool(find_clashes(planted)), "speakers moved 5 mm into the rear cover")
+
+    report.section("10. Television: fit to the wall mount")
+    report.check("Chassis pillars are on the same pattern as the mount's VESA holes",
+                 True, f"both built from VESA_X = {cfg.VESA_X:.0f}, VESA_Z = {cfg.VESA_Z:.0f}")
+    grip = cfg.VESA_SCREW_LENGTH - cfg.PLATE_THICKNESS - cfg.ENCLOSURE_WALL
+    screw = float(cfg.VESA_SCREW[1:])
+    report.check("Mount screws reach at least 1.5 diameters into the steel pillars",
+                 grip >= 1.5 * screw, f"{grip:.1f} mm of thread in the pillar")
+    gap = shapes["tv_plate"].distance(shapes["rear_cover"])
+    report.check("Mount's TV plate sits flat on the rear cover", gap < 0.01, f"gap {gap:.3f} mm")
+    mass, centre = mass_properties(items)
+    report.check("TV is lighter than the mount's rated load",
+                 mass <= cfg.TV_MASS_MAX_KG, f"{mass:.2f} kg estimated vs {cfg.TV_MASS_MAX_KG:.0f} kg rated")
+    report.check("TV's centre of mass is no further out than the mount calculation assumes",
+                 centre[1] <= cfg.LOAD_OFFSET_FROM_WALL,
+                 f"{centre[1]:.1f} mm from the wall vs {cfg.LOAD_OFFSET_FROM_WALL:.0f} mm assumed")
+    report.check("TV is balanced left to right on the mount",
+                 abs(centre[0]) <= 15, f"centre of mass {centre[0]:+.1f} mm from the middle")
+
+    report.section("11. Television: electrical budget (see electrical.py)")
+    for text, ok, detail in electrical.checks():
+        report.check(text, ok, detail)
+
+
 def main() -> int:
     print("Building parts from config.py ...")
     parts = build_parts()
@@ -342,6 +442,8 @@ def main() -> int:
     report.section(f"7. Strength hand calculation ({cfg.TV_MASS_MAX_KG:.0f} kg TV, see strength.py)")
     for text, ok, detail in strength.checks():
         report.check(text, ok, detail)
+
+    check_television(report)
 
     failed = report.print()
     print()

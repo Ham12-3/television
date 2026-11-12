@@ -1,0 +1,131 @@
+board,refs,qty,kind,description
+Main board,PCB,1,pcb,"170 x 190 mm, 4-layer, 1.6 mm"
+Main board,J1,1,port,HDMI 2.0 input 1 (type A receptacle)
+Main board,J2,1,port,HDMI 2.0 input 2 with ARC (type A receptacle)
+Main board,J3,1,port,USB 2.0 host 1 (type A receptacle)
+Main board,J4,1,port,USB 2.0 host 2 (type A receptacle)
+Main board,J5,1,port,Optical digital audio out (TOSLINK)
+Main board,J6,1,port,"Headphone out, 3.5 mm stereo jack"
+Main board,J7,1,port,"Composite video in (RCA, yellow)"
+Main board,J8,1,port,"Audio in left (RCA, white)"
+Main board,J9,1,port,"Audio in right (RCA, red)"
+Main board,J10,1,port,Antenna / cable RF in (IEC coaxial)
+Main board,J11,1,port,Ethernet 10/100 (RJ45 with magnetics)
+Main board,U1,1,ic,"Smart-TV system-on-chip, quad-core ARM, BGA"
+Main board,HS1,1,heatsink,Aluminium finned heatsink 40 x 40 x 10 on U1
+Main board,U2 U3,2,ic,"DDR3 SDRAM 512 MB, FBGA"
+Main board,U4,1,ic,"eMMC flash 8 GB, BGA"
+Main board,U5,1,ic,"SPI NOR flash 16 Mbit (boot loader), SOIC-8"
+Main board,Y1,1,passive,Crystal 24 MHz
+Main board,TU1,1,shield,Silicon tuner + demodulator under shield can
+Main board,U7,1,ic,"Class-D stereo audio amplifier 2 x 8 W, TSSOP"
+Main board,L1 L2 L3 L4,4,magnetic,Audio output filter inductor 22 uH
+Main board,C1 C2,2,cap,Electrolytic 470 uF 25 V (amplifier supply)
+Main board,U8,1,ic,"Buck converter 12 V to 5 V, 3 A"
+Main board,L5 L6,2,magnetic,Buck inductor 4.7 uH
+Main board,U9,1,ic,"Buck converter 12 V to 3.3 V, 2 A"
+Main board,U10,1,ic,"Buck converter 12 V to 1.1 V core, 3 A"
+Main board,L7,1,magnetic,Buck inductor 2.2 uH
+Main board,U14,1,ic,"LDO regulator 3.3 V to 1.5 V (DDR), SOT-223"
+Main board,C3 C4,2,cap,Electrolytic 220 uF 16 V
+Main board,U11,1,ic,"USB power switch with current limit, SOT-23-5"
+Main board,U12 U13,2,ic,HDMI ESD protection array
+Main board,CN1,1,connector,"Power in from PSU, 12-pin 2.0 mm wafer"
+Main board,CN2,1,connector,"LVDS to T-con, 51-pin 0.5 mm FFC socket"
+Main board,CN3,1,connector,"Speakers, 4-pin 2.0 mm wafer"
+Main board,CN4,1,connector,"IR / LED / key board, 6-pin 1.25 mm"
+Main board,CN5,1,connector,"Wi-Fi / Bluetooth module (USB), 4-pin 1.25 mm"
+Main board,CN6,1,connector,"Service UART header, 4-pin 2.54 mm"
+Main board,C10 C11 C12 C13 C14 C15 C16 C17 C18 C19 C20 C21 C22 C23 C24 C25 C26 C27 C28 C29 C30 C31 C32 C33 C34 C35 C36,27,passive,Ceramic capacitor 100 nF 0603
+Main board,R1 R2 R3 R4,4,passive,Resistor 0603
+Main board,R5 R6 R7 R8,4,passive,"Resistor array, HDMI DDC pull-ups"
+Power supply board,PCB,1,pcb,"170 x 130 mm, 1-layer, 1.6 mm"
+Power supply board,CN1,1,connector,"AC input, 2-pin 3.96 mm header"
+Power supply board,F1,1,passive,"Fuse T2.5 A 250 V, 5 x 20 mm in clips"
+Power supply board,RV1,1,passive,Varistor 275 VAC (surge protection)
+Power supply board,NTC1,1,passive,NTC inrush limiter 5 ohm
+Power supply board,CX1,1,cap,X2 film capacitor 0.22 uF 275 VAC
+Power supply board,CX2,1,cap,X2 film capacitor 0.1 uF 275 VAC
+Power supply board,LF1,1,magnetic,Common-mode choke 20 mH
+Power supply board,LF2,1,magnetic,Common-mode choke 10 mH
+Power supply board,BD1,1,ic,Bridge rectifier 4 A 600 V
+Power supply board,C1,1,cap,Bulk electrolytic 100 uF 400 V
+Power supply board,U1,1,ic,"Flyback PWM controller, SOIC-8"
+Power supply board,R1 R2,2,passive,Start-up resistor 1206
+Power supply board,HS1,1,heatsink,Aluminium heatsink plate (primary switch)
+Power supply board,Q1,1,ic,"Power MOSFET 650 V, TO-220F"
+Power supply board,T1,1,magnetic,"Flyback transformer, reinforced insulation"
+Power supply board,U2,1,ic,Optocoupler (feedback across the isolation barrier)
+Power supply board,CY1,1,cap,Y1 safety capacitor 2.2 nF
+Power supply board,HS2,1,heatsink,Aluminium heatsink plate (output rectifiers)
+Power supply board,D1,1,ic,"Schottky rectifier 20 A 60 V (12 V rail), TO-220"
+Power supply board,D2,1,ic,"Ultrafast rectifier 5 A 200 V (36 V rail), TO-220"
+Power supply board,C2 C3,2,cap,Electrolytic 1000 uF 16 V
+Power supply board,L1,1,magnetic,Output filter inductor 3.3 uH (12 V)
+Power supply board,C4,1,cap,Electrolytic 470 uF 16 V
+Power supply board,C5 C6,2,cap,Electrolytic 220 uF 63 V
+Power supply board,L2,1,magnetic,Output filter inductor 10 uH (36 V)
+Power supply board,U3,1,ic,"Shunt reference 2.5 V, TO-92"
+Power supply board,CN2,1,connector,"To main board, 12-pin 2.0 mm wafer"
+Power supply board,CN3,1,connector,"To LED driver, 6-pin 2.0 mm wafer"
+T-con board,PCB,1,pcb,"130 x 45 mm, 4-layer, 1.6 mm"
+T-con board,U1,1,ic,"Timing controller, LVDS in / mini-LVDS out, QFP"
+T-con board,U2,1,ic,"Panel power-management IC (AVDD, VGH, VGL, VCOM), QFN"
+T-con board,U3,1,ic,"Gamma reference buffer, TSSOP"
+T-con board,U4,1,ic,"EEPROM (panel timing data), SOIC-8"
+T-con board,U5,1,ic,"Gate-driver level shifter, QFN"
+T-con board,L1,1,magnetic,Boost inductor 10 uH (AVDD)
+T-con board,L2,1,magnetic,Buck inductor 4.7 uH (logic 3.3 V)
+T-con board,C1 C2,2,cap,Tantalum capacitor 22 uF 25 V
+T-con board,CN1,1,connector,"LVDS from main board, 51-pin 0.5 mm FFC socket"
+T-con board,CN2,1,connector,"To source board A, 60-pin 0.5 mm FFC socket"
+T-con board,CN3,1,connector,"To source board B, 60-pin 0.5 mm FFC socket"
+LED driver board,PCB,1,pcb,"90 x 50 mm, 2-layer, 1.6 mm"
+LED driver board,CN1,1,connector,"From PSU, 6-pin 2.0 mm wafer"
+LED driver board,C1,1,cap,Electrolytic 220 uF 50 V (input)
+LED driver board,L1,1,magnetic,"Boost inductor 47 uH 2 A, shielded"
+LED driver board,Q1,1,ic,"Boost MOSFET 150 V, DPAK"
+LED driver board,D1,1,ic,"Schottky diode 3 A 150 V, SMC"
+LED driver board,U1,1,ic,"LED boost controller with PWM dimming, SOIC-16"
+LED driver board,C2,1,cap,Electrolytic 47 uF 100 V (output)
+LED driver board,R1 R2,2,passive,Current-sense resistor 0.56 ohm 2512
+LED driver board,CN2,1,connector,"To LED strips, 4-pin 2.0 mm wafer"
+Wi-Fi / Bluetooth module,PCB,1,pcb,"40 x 26 mm, 2-layer, 1.6 mm"
+Wi-Fi / Bluetooth module,U1,1,shield,Wi-Fi 5 + Bluetooth 5 radio under shield can
+Wi-Fi / Bluetooth module,CN1,1,connector,"USB to main board, 4-pin 1.25 mm"
+Wi-Fi / Bluetooth module,Y1,1,passive,Crystal 40 MHz
+IR / LED / key board,PCB,1,pcb,"54 x 8 mm, 1-layer, 1.6 mm"
+IR / LED / key board,U1,1,ic,Infrared receiver module 38 kHz
+IR / LED / key board,LED1,1,passive,"Standby indicator LED, 3 mm, red"
+IR / LED / key board,SW1,1,passive,"Tactile switch, right-angle (power / menu)"
+IR / LED / key board,CN1,1,connector,"To main board, 6-pin 1.25 mm"
+Enclosure,-,1,mechanical,"Front bezel, ABS, injection moulded"
+Enclosure,-,1,mechanical,"Rear cover, ABS, injection moulded"
+Enclosure,-,1,mechanical,"IR window, smoked polycarbonate"
+Enclosure,-,7,mechanical,Rear cover screw M3 x 8 pan head
+Panel,-,1,mechanical,"LCD cell 32 inch class, 1920 x 1080"
+Panel,-,2,mechanical,Source driver board with chip-on-film drivers
+Panel,-,1,mechanical,"Mould frame, plastic"
+Backlight,-,2,mechanical,Prism sheet
+Backlight,-,1,mechanical,Diffuser sheet
+Backlight,-,1,mechanical,Diffuser plate 1.5 mm
+Backlight,-,1,mechanical,Reflector sheet
+Backlight,-,6,mechanical,Diffuser support pin
+Backlight,-,3,mechanical,"LED strip, 8 LEDs with lenses, aluminium PCB"
+Chassis,-,1,mechanical,"Back chassis, steel 0.6 mm, with pillars"
+Audio,-,2,mechanical,"Speaker 8 W 8 ohm, enclosed"
+Power,-,1,mechanical,"Mains inlet, 2-pin (IEC C8 style)"
+Fixings,-,18,mechanical,Board screw M3 x 6 pan head
+Accessories,-,2,mechanical,Stand foot
+Accessories,-,1,mechanical,Infrared remote control with 2 x AAA cells
+Accessories,-,1,mechanical,"Wall mount, 3D printed PETG (4 parts, 5 pieces)"
+Cables,-,1,cable,2-core mains lead: Mains inlet to PSU
+Cables,-,1,cable,12-way wire harness: PSU to Main board
+Cables,-,1,cable,6-way wire harness: PSU to LED driver
+Cables,-,1,cable,4-way wire harness: LED driver to LED strips
+Cables,-,1,cable,51-way 0.5 mm FFC: Main board to T-con
+Cables,-,1,cable,60-way 0.5 mm FFC: T-con to Source board A
+Cables,-,1,cable,60-way 0.5 mm FFC: T-con to Source board B
+Cables,-,1,cable,2 x twin lead: Main board to Speakers
+Cables,-,1,cable,6-way wire harness: Main board to IR / LED / key board
+Cables,-,1,cable,4-way wire harness: Main board to Wi-Fi / Bluetooth module

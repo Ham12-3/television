@@ -4,93 +4,2143 @@
   "parts": [
     {
       "name": "wall_plate",
+      "group": "Wall mount",
       "file": "wall_plate.stl",
       "colour": [
         0.16,
         0.16,
         0.18
       ],
+      "opacity": 1.0,
+      "explode": [
+        0,
+        0,
+        0
+      ],
+      "visible": true,
       "size_mm": [
         160.0,
         17.7,
         130.0
       ],
-      "volume_mm3": 126299.7,
       "mass_g": 160.4,
+      "note": "3D printed PETG",
       "print_file": "../stl_print/wall_plate.stl",
       "print_rotation_x_deg": 90
     },
     {
       "name": "tv_plate",
+      "group": "Wall mount",
       "file": "tv_plate.stl",
       "colour": [
         0.3,
         0.3,
         0.33
       ],
+      "opacity": 1.0,
+      "explode": [
+        0,
+        30,
+        0
+      ],
+      "visible": true,
       "size_mm": [
         140.0,
         17.7,
         140.0
       ],
-      "volume_mm3": 113141.2,
       "mass_g": 143.7,
+      "note": "3D printed PETG",
       "print_file": "../stl_print/tv_plate.stl",
       "print_rotation_x_deg": -90
     },
     {
       "name": "lock_clip",
+      "group": "Wall mount",
       "file": "lock_clip.stl",
       "colour": [
         0.9,
         0.45,
         0.1
       ],
+      "opacity": 1.0,
+      "explode": [
+        0,
+        12,
+        -45
+      ],
+      "visible": true,
       "size_mm": [
         50.0,
         8.0,
         42.78
       ],
-      "volume_mm3": 5670.1,
       "mass_g": 7.2,
+      "note": "3D printed PETG",
       "print_file": "../stl_print/lock_clip.stl",
       "print_rotation_x_deg": 90
     },
     {
       "name": "cable_clip_1",
+      "group": "Wall mount",
       "file": "cable_clip_1.stl",
       "colour": [
         0.2,
         0.5,
         0.8
       ],
+      "opacity": 1.0,
+      "explode": [
+        0,
+        12,
+        -45
+      ],
+      "visible": true,
       "size_mm": [
         16.8,
         16.8,
         30.18
       ],
-      "volume_mm3": 2099.3,
       "mass_g": 2.7,
+      "note": "3D printed PETG",
       "print_file": "../stl_print/cable_clip.stl",
       "print_rotation_x_deg": 90
     },
     {
       "name": "cable_clip_2",
+      "group": "Wall mount",
       "file": "cable_clip_2.stl",
       "colour": [
         0.2,
         0.5,
         0.8
       ],
+      "opacity": 1.0,
+      "explode": [
+        0,
+        12,
+        -45
+      ],
+      "visible": true,
       "size_mm": [
         16.8,
         16.8,
         30.18
       ],
-      "volume_mm3": 2099.3,
       "mass_g": 2.7,
+      "note": "3D printed PETG",
       "print_file": "../stl_print/cable_clip.stl",
       "print_rotation_x_deg": 90
+    },
+    {
+      "name": "rear_cover",
+      "group": "Enclosure",
+      "file": "rear_cover.stl",
+      "colour": [
+        0.16,
+        0.16,
+        0.18
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        70.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        730.0,
+        56.0,
+        430.0
+      ],
+      "mass_g": 969.3,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "cover_screws",
+      "group": "Enclosure",
+      "file": "cover_screws.stl",
+      "colour": [
+        0.62,
+        0.64,
+        0.67
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        45.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        645.6,
+        11.0,
+        372.6
+      ],
+      "mass_g": 6.2,
+      "count": 7,
+      "note": ""
+    },
+    {
+      "name": "front_bezel",
+      "group": "Enclosure",
+      "file": "front_bezel.stl",
+      "colour": [
+        0.09,
+        0.09,
+        0.1
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        520.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        730.0,
+        14.0,
+        430.0
+      ],
+      "mass_g": 143.3,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "ir_window",
+      "group": "Enclosure",
+      "file": "ir_window.stl",
+      "colour": [
+        0.3,
+        0.05,
+        0.06
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        540.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        6.0,
+        2.0,
+        6.0
+      ],
+      "mass_g": 0.1,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "brand_badge",
+      "group": "Enclosure",
+      "file": "brand_badge.stl",
+      "colour": [
+        0.75,
+        0.76,
+        0.78
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        540.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        44.0,
+        0.6,
+        7.0
+      ],
+      "mass_g": 0.2,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "lcd_cell",
+      "group": "Panel and backlight",
+      "file": "lcd_cell.stl",
+      "colour": [
+        0.04,
+        0.06,
+        0.11
+      ],
+      "opacity": 0.92,
+      "explode": [
+        0.0,
+        480.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        710.0,
+        1.6,
+        405.0
+      ],
+      "mass_g": 1012.2,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "mould_frame",
+      "group": "Panel and backlight",
+      "file": "mould_frame.stl",
+      "colour": [
+        0.22,
+        0.22,
+        0.24
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        450.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        713.6,
+        15.55,
+        408.6
+      ],
+      "mass_g": 83.6,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "prism_sheet_upper",
+      "group": "Panel and backlight",
+      "file": "prism_sheet_upper.stl",
+      "colour": [
+        0.86,
+        0.9,
+        0.96
+      ],
+      "opacity": 0.55,
+      "explode": [
+        0.0,
+        425.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        706.0,
+        0.25,
+        401.0
+      ],
+      "mass_g": 97.7,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "prism_sheet_lower",
+      "group": "Panel and backlight",
+      "file": "prism_sheet_lower.stl",
+      "colour": [
+        0.86,
+        0.9,
+        0.96
+      ],
+      "opacity": 0.55,
+      "explode": [
+        0.0,
+        413.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        706.0,
+        0.25,
+        401.0
+      ],
+      "mass_g": 97.7,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "diffuser_sheet",
+      "group": "Panel and backlight",
+      "file": "diffuser_sheet.stl",
+      "colour": [
+        0.86,
+        0.9,
+        0.96
+      ],
+      "opacity": 0.55,
+      "explode": [
+        0.0,
+        401.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        706.0,
+        0.25,
+        401.0
+      ],
+      "mass_g": 97.7,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "diffuser_plate",
+      "group": "Panel and backlight",
+      "file": "diffuser_plate.stl",
+      "colour": [
+        0.97,
+        0.97,
+        0.95
+      ],
+      "opacity": 0.85,
+      "explode": [
+        0.0,
+        385.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        706.0,
+        1.5,
+        401.0
+      ],
+      "mass_g": 445.9,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "support_pins",
+      "group": "Panel and backlight",
+      "file": "support_pins.stl",
+      "colour": [
+        0.96,
+        0.96,
+        0.94
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        350.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        358.0,
+        25.4,
+        139.0
+      ],
+      "mass_g": 3.5,
+      "count": 6,
+      "note": ""
+    },
+    {
+      "name": "reflector_sheet",
+      "group": "Panel and backlight",
+      "file": "reflector_sheet.stl",
+      "colour": [
+        0.96,
+        0.96,
+        0.94
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        335.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        706.0,
+        0.3,
+        401.0
+      ],
+      "mass_g": 115.1,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "led_lenses",
+      "group": "Panel and backlight",
+      "file": "led_lenses.stl",
+      "colour": [
+        0.8,
+        0.9,
+        1.0
+      ],
+      "opacity": 0.6,
+      "explode": [
+        0.0,
+        320.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        575.0,
+        5.5,
+        277.0
+      ],
+      "mass_g": 23.8,
+      "count": 24,
+      "note": ""
+    },
+    {
+      "name": "led_chips",
+      "group": "Panel and backlight",
+      "file": "led_chips.stl",
+      "colour": [
+        1.0,
+        0.88,
+        0.25
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        310.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        563.0,
+        0.8,
+        265.0
+      ],
+      "mass_g": 0.3,
+      "count": 24,
+      "note": ""
+    },
+    {
+      "name": "led_strips",
+      "group": "Panel and backlight",
+      "file": "led_strips.stl",
+      "colour": [
+        0.88,
+        0.88,
+        0.85
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        310.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        640.0,
+        1.0,
+        278.0
+      ],
+      "mass_g": 82.9,
+      "count": 3,
+      "note": ""
+    },
+    {
+      "name": "source_boards",
+      "group": "Panel and backlight",
+      "file": "source_boards.stl",
+      "colour": [
+        0.05,
+        0.38,
+        0.16
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        265.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        670.0,
+        1.0,
+        18.0
+      ],
+      "mass_g": 22.0,
+      "count": 2,
+      "note": ""
+    },
+    {
+      "name": "source_sockets",
+      "group": "Panel and backlight",
+      "file": "source_sockets.stl",
+      "colour": [
+        0.92,
+        0.9,
+        0.82
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        265.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        277.0,
+        2.0,
+        5.0
+      ],
+      "mass_g": 0.6,
+      "count": 2,
+      "note": ""
+    },
+    {
+      "name": "source_cofs",
+      "group": "Panel and backlight",
+      "file": "source_cofs.stl",
+      "colour": [
+        0.8,
+        0.52,
+        0.15
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        265.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        600.0,
+        31.25,
+        14.4
+      ],
+      "mass_g": 3.2,
+      "count": 8,
+      "note": ""
+    },
+    {
+      "name": "back_chassis",
+      "group": "Chassis",
+      "file": "back_chassis.stl",
+      "colour": [
+        0.62,
+        0.64,
+        0.67
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        280.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        709.2,
+        60.45,
+        404.2
+      ],
+      "mass_g": 1812.9,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "mainboard_pcb",
+      "group": "Main board",
+      "file": "mainboard_pcb.stl",
+      "colour": [
+        0.05,
+        0.38,
+        0.16
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        170.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        170.0,
+        1.6,
+        190.0
+      ],
+      "mass_g": 95.5,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "mainboard_ports",
+      "group": "Main board",
+      "file": "mainboard_ports.stl",
+      "colour": [
+        0.7,
+        0.71,
+        0.73
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        21.0,
+        13.5,
+        157.5
+      ],
+      "mass_g": 16.9,
+      "count": 11,
+      "note": ""
+    },
+    {
+      "name": "mainboard_chips",
+      "group": "Main board",
+      "file": "mainboard_chips.stl",
+      "colour": [
+        0.1,
+        0.1,
+        0.11
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        130.0,
+        1.7,
+        131.6
+      ],
+      "mass_g": 2.9,
+      "count": 13,
+      "note": ""
+    },
+    {
+      "name": "mainboard_heatsinks",
+      "group": "Main board",
+      "file": "mainboard_heatsinks.stl",
+      "colour": [
+        0.78,
+        0.79,
+        0.8
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        40.0,
+        10.0,
+        40.0
+      ],
+      "mass_g": 20.3,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "mainboard_passives",
+      "group": "Main board",
+      "file": "mainboard_passives.stl",
+      "colour": [
+        0.32,
+        0.26,
+        0.2
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        106.4,
+        0.8,
+        124.8
+      ],
+      "mass_g": 0.1,
+      "count": 36,
+      "note": ""
+    },
+    {
+      "name": "mainboard_shields",
+      "group": "Main board",
+      "file": "mainboard_shields.stl",
+      "colour": [
+        0.8,
+        0.8,
+        0.76
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        28.0,
+        4.0,
+        22.0
+      ],
+      "mass_g": 19.3,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "mainboard_magnetics",
+      "group": "Main board",
+      "file": "mainboard_magnetics.stl",
+      "colour": [
+        0.55,
+        0.38,
+        0.12
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        10.5,
+        4.5,
+        93.5
+      ],
+      "mass_g": 5.3,
+      "count": 7,
+      "note": ""
+    },
+    {
+      "name": "mainboard_capacitors",
+      "group": "Main board",
+      "file": "mainboard_capacitors.stl",
+      "colour": [
+        0.15,
+        0.22,
+        0.42
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        87.15,
+        10.0,
+        123.15
+      ],
+      "mass_g": 2.3,
+      "count": 4,
+      "note": ""
+    },
+    {
+      "name": "mainboard_connectors",
+      "group": "Main board",
+      "file": "mainboard_connectors.stl",
+      "colour": [
+        0.92,
+        0.9,
+        0.82
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        136.0,
+        8.0,
+        188.0
+      ],
+      "mass_g": 2.3,
+      "count": 6,
+      "note": ""
+    },
+    {
+      "name": "mainboard_screws",
+      "group": "Main board",
+      "file": "mainboard_screws.stl",
+      "colour": [
+        0.6,
+        0.6,
+        0.62
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        145.5,
+        10.2,
+        185.5
+      ],
+      "mass_g": 3.3,
+      "count": 4,
+      "note": ""
+    },
+    {
+      "name": "psu_board_pcb",
+      "group": "Power supply board",
+      "file": "psu_board_pcb.stl",
+      "colour": [
+        0.72,
+        0.6,
+        0.33
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        170.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        170.0,
+        1.6,
+        130.0
+      ],
+      "mass_g": 65.2,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "psu_board_connectors",
+      "group": "Power supply board",
+      "file": "psu_board_connectors.stl",
+      "colour": [
+        0.92,
+        0.9,
+        0.82
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        164.0,
+        14.0,
+        102.5
+      ],
+      "mass_g": 3.3,
+      "count": 3,
+      "note": ""
+    },
+    {
+      "name": "psu_board_passives",
+      "group": "Power supply board",
+      "file": "psu_board_passives.stl",
+      "colour": [
+        0.32,
+        0.26,
+        0.2
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        63.6,
+        13.0,
+        69.8
+      ],
+      "mass_g": 5.6,
+      "count": 5,
+      "note": ""
+    },
+    {
+      "name": "psu_board_capacitors",
+      "group": "Power supply board",
+      "file": "psu_board_capacitors.stl",
+      "colour": [
+        0.15,
+        0.22,
+        0.42
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        126.0,
+        20.0,
+        101.5
+      ],
+      "mass_g": 28.2,
+      "count": 9,
+      "note": ""
+    },
+    {
+      "name": "psu_board_magnetics",
+      "group": "Power supply board",
+      "file": "psu_board_magnetics.stl",
+      "colour": [
+        0.55,
+        0.38,
+        0.12
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        116.0,
+        22.0,
+        51.0
+      ],
+      "mass_g": 117.4,
+      "count": 5,
+      "note": ""
+    },
+    {
+      "name": "psu_board_chips",
+      "group": "Power supply board",
+      "file": "psu_board_chips.stl",
+      "colour": [
+        0.1,
+        0.1,
+        0.11
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        116.0,
+        19.0,
+        30.2
+      ],
+      "mass_g": 8.1,
+      "count": 7,
+      "note": ""
+    },
+    {
+      "name": "psu_board_heatsinks",
+      "group": "Power supply board",
+      "file": "psu_board_heatsinks.stl",
+      "colour": [
+        0.78,
+        0.79,
+        0.8
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        101.0,
+        22.0,
+        3.0
+      ],
+      "mass_g": 16.0,
+      "count": 2,
+      "note": ""
+    },
+    {
+      "name": "psu_board_screws",
+      "group": "Power supply board",
+      "file": "psu_board_screws.stl",
+      "colour": [
+        0.6,
+        0.6,
+        0.62
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        165.5,
+        10.2,
+        125.5
+      ],
+      "mass_g": 3.3,
+      "count": 4,
+      "note": ""
+    },
+    {
+      "name": "tcon_board_pcb",
+      "group": "T-con board",
+      "file": "tcon_board_pcb.stl",
+      "colour": [
+        0.05,
+        0.38,
+        0.16
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        170.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        130.0,
+        1.6,
+        45.0
+      ],
+      "mass_g": 17.2,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "tcon_board_chips",
+      "group": "T-con board",
+      "file": "tcon_board_chips.stl",
+      "colour": [
+        0.1,
+        0.1,
+        0.11
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        68.5,
+        1.7,
+        20.0
+      ],
+      "mass_g": 0.8,
+      "count": 5,
+      "note": ""
+    },
+    {
+      "name": "tcon_board_magnetics",
+      "group": "T-con board",
+      "file": "tcon_board_magnetics.stl",
+      "colour": [
+        0.55,
+        0.38,
+        0.12
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        6.0,
+        4.0,
+        16.0
+      ],
+      "mass_g": 1.2,
+      "count": 2,
+      "note": ""
+    },
+    {
+      "name": "tcon_board_capacitors",
+      "group": "T-con board",
+      "file": "tcon_board_capacitors.stl",
+      "colour": [
+        0.15,
+        0.22,
+        0.42
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        24.3,
+        2.8,
+        8.3
+      ],
+      "mass_g": 0.3,
+      "count": 2,
+      "note": ""
+    },
+    {
+      "name": "tcon_board_connectors",
+      "group": "T-con board",
+      "file": "tcon_board_connectors.stl",
+      "colour": [
+        0.92,
+        0.9,
+        0.82
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        118.0,
+        2.0,
+        35.5
+      ],
+      "mass_g": 1.0,
+      "count": 3,
+      "note": ""
+    },
+    {
+      "name": "tcon_board_screws",
+      "group": "T-con board",
+      "file": "tcon_board_screws.stl",
+      "colour": [
+        0.6,
+        0.6,
+        0.62
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        127.5,
+        10.2,
+        42.5
+      ],
+      "mass_g": 3.3,
+      "count": 4,
+      "note": ""
+    },
+    {
+      "name": "led_driver_board_pcb",
+      "group": "LED driver board",
+      "file": "led_driver_board_pcb.stl",
+      "colour": [
+        0.05,
+        0.38,
+        0.16
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        170.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        90.0,
+        1.6,
+        50.0
+      ],
+      "mass_g": 13.2,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "led_driver_board_connectors",
+      "group": "LED driver board",
+      "file": "led_driver_board_connectors.stl",
+      "colour": [
+        0.92,
+        0.9,
+        0.82
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        50.0,
+        8.0,
+        31.5
+      ],
+      "mass_g": 1.2,
+      "count": 2,
+      "note": ""
+    },
+    {
+      "name": "led_driver_board_capacitors",
+      "group": "LED driver board",
+      "file": "led_driver_board_capacitors.stl",
+      "colour": [
+        0.15,
+        0.22,
+        0.42
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        64.0,
+        20.0,
+        16.0
+      ],
+      "mass_g": 4.2,
+      "count": 2,
+      "note": ""
+    },
+    {
+      "name": "led_driver_board_magnetics",
+      "group": "LED driver board",
+      "file": "led_driver_board_magnetics.stl",
+      "colour": [
+        0.55,
+        0.38,
+        0.12
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        12.0,
+        8.0,
+        12.0
+      ],
+      "mass_g": 4.6,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "led_driver_board_chips",
+      "group": "LED driver board",
+      "file": "led_driver_board_chips.stl",
+      "colour": [
+        0.1,
+        0.1,
+        0.11
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        20.25,
+        2.4,
+        24.0
+      ],
+      "mass_g": 0.7,
+      "count": 3,
+      "note": ""
+    },
+    {
+      "name": "led_driver_board_passives",
+      "group": "LED driver board",
+      "file": "led_driver_board_passives.stl",
+      "colour": [
+        0.32,
+        0.26,
+        0.2
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        6.4,
+        0.6,
+        9.2
+      ],
+      "mass_g": 0.0,
+      "count": 2,
+      "note": ""
+    },
+    {
+      "name": "led_driver_board_screws",
+      "group": "LED driver board",
+      "file": "led_driver_board_screws.stl",
+      "colour": [
+        0.6,
+        0.6,
+        0.62
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        87.5,
+        10.2,
+        47.5
+      ],
+      "mass_g": 3.3,
+      "count": 4,
+      "note": ""
+    },
+    {
+      "name": "wifi_board_pcb",
+      "group": "Wi-Fi / Bluetooth module",
+      "file": "wifi_board_pcb.stl",
+      "colour": [
+        0.05,
+        0.2,
+        0.42
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        170.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        40.0,
+        1.6,
+        26.0
+      ],
+      "mass_g": 3.0,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "wifi_board_shields",
+      "group": "Wi-Fi / Bluetooth module",
+      "file": "wifi_board_shields.stl",
+      "colour": [
+        0.8,
+        0.8,
+        0.76
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        20.0,
+        2.2,
+        14.0
+      ],
+      "mass_g": 4.8,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "wifi_board_connectors",
+      "group": "Wi-Fi / Bluetooth module",
+      "file": "wifi_board_connectors.stl",
+      "colour": [
+        0.92,
+        0.9,
+        0.82
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        7.0,
+        4.5,
+        4.0
+      ],
+      "mass_g": 0.1,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "wifi_board_passives",
+      "group": "Wi-Fi / Bluetooth module",
+      "file": "wifi_board_passives.stl",
+      "colour": [
+        0.32,
+        0.26,
+        0.2
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        3.2,
+        0.8,
+        2.5
+      ],
+      "mass_g": 0.0,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "wifi_board_screws",
+      "group": "Wi-Fi / Bluetooth module",
+      "file": "wifi_board_screws.stl",
+      "colour": [
+        0.6,
+        0.6,
+        0.62
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        152.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        39.5,
+        10.2,
+        5.5
+      ],
+      "mass_g": 1.7,
+      "count": 2,
+      "note": ""
+    },
+    {
+      "name": "ir_board_pcb",
+      "group": "IR / LED / key board",
+      "file": "ir_board_pcb.stl",
+      "colour": [
+        0.05,
+        0.38,
+        0.16
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        500.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        54.0,
+        1.6,
+        8.5
+      ],
+      "mass_g": 1.4,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "ir_board_chips",
+      "group": "IR / LED / key board",
+      "file": "ir_board_chips.stl",
+      "colour": [
+        0.1,
+        0.1,
+        0.11
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        518.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        5.0,
+        5.6,
+        6.0
+      ],
+      "mass_g": 0.3,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "ir_board_passives",
+      "group": "IR / LED / key board",
+      "file": "ir_board_passives.stl",
+      "colour": [
+        0.32,
+        0.26,
+        0.2
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        518.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        26.0,
+        5.0,
+        10.75
+      ],
+      "mass_g": 0.4,
+      "count": 3,
+      "note": ""
+    },
+    {
+      "name": "ir_board_connectors",
+      "group": "IR / LED / key board",
+      "file": "ir_board_connectors.stl",
+      "colour": [
+        0.92,
+        0.9,
+        0.82
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        518.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        10.0,
+        4.5,
+        4.0
+      ],
+      "mass_g": 0.2,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "speakers",
+      "group": "Speakers and mains",
+      "file": "speakers.stl",
+      "colour": [
+        0.09,
+        0.09,
+        0.1
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        120.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        570.0,
+        26.0,
+        33.5
+      ],
+      "mass_g": 167.8,
+      "count": 2,
+      "note": ""
+    },
+    {
+      "name": "mains_inlet",
+      "group": "Speakers and mains",
+      "file": "mains_inlet.stl",
+      "colour": [
+        0.09,
+        0.09,
+        0.1
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        120.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        20.0,
+        14.0,
+        23.0
+      ],
+      "mass_g": 6.8,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "cable_psu_to_main",
+      "group": "Cables",
+      "file": "cable_psu_to_main.stl",
+      "colour": [
+        0.55,
+        0.55,
+        0.58
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        135.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        306.0,
+        2.5,
+        12.0
+      ],
+      "mass_g": 13.8,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "cable_psu_to_led_driver",
+      "group": "Cables",
+      "file": "cable_psu_to_led_driver.stl",
+      "colour": [
+        0.55,
+        0.55,
+        0.58
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        135.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        29.0,
+        2.5,
+        98.0
+      ],
+      "mass_g": 3.6,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "cable_led_strips",
+      "group": "Cables",
+      "file": "cable_led_strips.stl",
+      "colour": [
+        0.55,
+        0.55,
+        0.58
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        135.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        6.0,
+        22.2,
+        23.0
+      ],
+      "mass_g": 2.1,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "cable_mains",
+      "group": "Cables",
+      "file": "cable_mains.stl",
+      "colour": [
+        0.55,
+        0.55,
+        0.58
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        135.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        71.0,
+        2.5,
+        6.0
+      ],
+      "mass_g": 1.6,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "ffc_lvds",
+      "group": "Cables",
+      "file": "ffc_lvds.stl",
+      "colour": [
+        0.85,
+        0.85,
+        0.8
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        135.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        63.75,
+        0.3,
+        44.75
+      ],
+      "mass_g": 1.0,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "ffc_source_a",
+      "group": "Cables",
+      "file": "ffc_source_a.stl",
+      "colour": [
+        0.85,
+        0.85,
+        0.8
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        135.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        30.0,
+        6.7,
+        42.25
+      ],
+      "mass_g": 0.7,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "ffc_source_b",
+      "group": "Cables",
+      "file": "ffc_source_b.stl",
+      "colour": [
+        0.85,
+        0.85,
+        0.8
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        135.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        194.0,
+        6.7,
+        42.25
+      ],
+      "mass_g": 2.9,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "cable_speaker_right",
+      "group": "Cables",
+      "file": "cable_speaker_right.stl",
+      "colour": [
+        0.55,
+        0.55,
+        0.58
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        135.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        18.5,
+        3.0,
+        106.0
+      ],
+      "mass_g": 1.6,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "cable_speaker_left",
+      "group": "Cables",
+      "file": "cable_speaker_left.stl",
+      "colour": [
+        0.55,
+        0.55,
+        0.58
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        135.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        531.0,
+        3.0,
+        88.5
+      ],
+      "mass_g": 8.3,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "cable_ir_board",
+      "group": "Cables",
+      "file": "cable_ir_board.stl",
+      "colour": [
+        0.55,
+        0.55,
+        0.58
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        135.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        126.0,
+        37.85,
+        116.0
+      ],
+      "mass_g": 1.7,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "cable_wifi",
+      "group": "Cables",
+      "file": "cable_wifi.stl",
+      "colour": [
+        0.55,
+        0.55,
+        0.58
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0.0,
+        135.0,
+        0.0
+      ],
+      "visible": true,
+      "size_mm": [
+        2.0,
+        2.0,
+        49.5
+      ],
+      "mass_g": 0.3,
+      "count": 1,
+      "note": ""
+    },
+    {
+      "name": "stand_feet",
+      "group": "Stand feet",
+      "file": "stand_feet.stl",
+      "colour": [
+        0.09,
+        0.09,
+        0.1
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0,
+        0,
+        -70
+      ],
+      "visible": false,
+      "size_mm": [
+        665.0,
+        200.0,
+        37.0
+      ],
+      "mass_g": 134.4,
+      "count": 2,
+      "note": "Not fitted when the TV is on the wall mount"
+    },
+    {
+      "name": "remote_top_shell",
+      "group": "Remote control",
+      "file": "remote_top_shell.stl",
+      "colour": [
+        0.09,
+        0.09,
+        0.1
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0,
+        0,
+        60
+      ],
+      "visible": true,
+      "size_mm": [
+        165.0,
+        44.0,
+        9.0
+      ],
+      "mass_g": 14.0,
+      "count": 1,
+      "note": "Accessory: shown on the table in front of the TV"
+    },
+    {
+      "name": "remote_keypad",
+      "group": "Remote control",
+      "file": "remote_keypad.stl",
+      "colour": [
+        0.35,
+        0.36,
+        0.4
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0,
+        0,
+        40
+      ],
+      "visible": true,
+      "size_mm": [
+        150.0,
+        38.0,
+        6.7
+      ],
+      "mass_g": 18.4,
+      "count": 1,
+      "note": "Accessory: shown on the table in front of the TV"
+    },
+    {
+      "name": "remote_electronics",
+      "group": "Remote control",
+      "file": "remote_electronics.stl",
+      "colour": [
+        0.05,
+        0.38,
+        0.16
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0,
+        0,
+        20
+      ],
+      "visible": true,
+      "size_mm": [
+        157.0,
+        38.0,
+        6.0
+      ],
+      "mass_g": 10.9,
+      "count": 3,
+      "note": "Accessory: shown on the table in front of the TV"
+    },
+    {
+      "name": "remote_batteries",
+      "group": "Remote control",
+      "file": "remote_batteries.stl",
+      "colour": [
+        0.8,
+        0.62,
+        0.15
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0,
+        0,
+        -15
+      ],
+      "visible": true,
+      "size_mm": [
+        44.5,
+        22.0,
+        10.5
+      ],
+      "mass_g": 17.7,
+      "count": 2,
+      "note": "Accessory: shown on the table in front of the TV"
+    },
+    {
+      "name": "remote_battery_door",
+      "group": "Remote control",
+      "file": "remote_battery_door.stl",
+      "colour": [
+        0.16,
+        0.16,
+        0.18
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0,
+        0,
+        -50
+      ],
+      "visible": true,
+      "size_mm": [
+        52.0,
+        28.0,
+        1.6
+      ],
+      "mass_g": 2.4,
+      "count": 1,
+      "note": "Accessory: shown on the table in front of the TV"
+    },
+    {
+      "name": "remote_bottom_shell",
+      "group": "Remote control",
+      "file": "remote_bottom_shell.stl",
+      "colour": [
+        0.16,
+        0.16,
+        0.18
+      ],
+      "opacity": 1.0,
+      "explode": [
+        0,
+        0,
+        -30
+      ],
+      "visible": true,
+      "size_mm": [
+        165.0,
+        44.0,
+        11.0
+      ],
+      "mass_g": 16.0,
+      "count": 1,
+      "note": "Accessory: shown on the table in front of the TV"
     }
-  ]
+  ],
+  "tv": {
+    "diagonal_inch": 32,
+    "size_mm": [
+      730.0,
+      70.0,
+      430.0
+    ],
+    "mass_kg": 5.71,
+    "centre_of_mass_from_wall_mm": 64.8
+  }
 }
