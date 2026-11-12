@@ -19,6 +19,7 @@ from pathlib import Path
 
 import config as cfg
 from tv.board_data import BOARDS, MAIN
+from tv.netlist import KIND_TITLE, NETS, net_members
 
 ROOT = Path(__file__).parent
 
@@ -254,6 +255,7 @@ def table(headers, rows) -> str:
 
 def write_doc(path: Path) -> None:
     r = budget()
+    members = net_members()
     ports = [(p["ref"], p["desc"]) for p in MAIN["parts"] if p["kind"] == "port"]
     counts = {b["title"]: len(b["parts"]) for b in BOARDS}
     doc = f"""# Electrical design: 32 inch LED television
@@ -263,7 +265,7 @@ Do not edit by hand; change the source and regenerate.
 
 **Level of detail.** This is a system-level reference design: what the blocks
 are, how they connect, what power they need and where the parts sit on each
-board. It contains no circuit schematics and no PCB layouts. Read section 9
+board. It contains no circuit schematics and no PCB layouts. Read section 10
 before using any of it.
 
 ## 1. Block diagram
@@ -435,7 +437,18 @@ and modules' datasheets.
     ("Venting", "Rear cover", "Intake slots low, exhaust slots along the top"),
 ])}
 
-## 9. Limits: what this is not
+## 9. Net list
+
+`tv/netlist.py` records which nets every component touches and what the
+component is for. The viewer uses it: click a part to see its connections, or
+pick a net to light up everything on it. It is connectivity at block level
+(which parts share a rail or a signal bundle), not a pin-by-pin schematic.
+
+{table(["Net", "Type", "Level", "What it is", "Parts on it"],
+       [(f"`{name}`", KIND_TITLE[kind], level, about, len(members[name]))
+        for name, (kind, level, _, about) in NETS.items()])}
+
+## 10. Limits: what this is not
 
 1. **Not a buildable design.** There are no schematics, netlists, PCB layouts
    or firmware. Component positions are a plausible arrangement, not a routed
@@ -455,7 +468,7 @@ and modules' datasheets.
 7. **Parts are generic.** The bill of materials describes kinds of part, not
    orderable part numbers.
 
-## 10. Bill of materials
+## 11. Bill of materials
 
 `output/bom.csv`, written by this script: {len(bom_rows())} lines covering every
 board, the mechanical parts, the cables and the accessories.

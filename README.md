@@ -10,7 +10,7 @@ its accessories, built with Python and build123d:
 - **Electrical design:** block diagram, power budget, connector pinouts and a
   bill of materials
 
-**Status:** modelled, exported, viewable in the browser, and passing all 120
+**Status:** modelled, exported, viewable in the browser, and passing all 122
 validation checks. It is a reference design. Nothing has been built, printed or
 tested, and the electrical design is at block level with no schematics. Read
 the limits in each design document before relying on any of it.
@@ -53,6 +53,10 @@ Then open <http://localhost:5173/>. Press Ctrl+C in the terminal to stop it.
 - **Parts** lists every item in groups; tick or untick a group or a single item.
   This is how you separate the wall mount from the TV, or show the stand feet.
 - **Explode** pulls every layer apart.
+- **Click any part** for a card saying what it is, what it does and what it
+  connects to. Components carry labels (U1, C3, CN2 ...) when you zoom in.
+- **Electrical** lists all 49 nets: power rails, mains, control, video, audio
+  and data. Pick one to light up every part, cable and copper trace on it.
 - It must be served like this; opening `index.html` by double-click will not
   work, because browsers block pages on disk from loading other files.
 - three.js (version 0.160.0) loads from the jsDelivr CDN, so the page needs
@@ -83,6 +87,7 @@ exported files no longer match the design.
 |-----------|------|
 | Any size: screen, bezel, depth, layer thicknesses, board positions, the mount | `config.py` |
 | What is on a circuit board and where | `tv/board_data.py` |
+| What a component does and what it connects to | `tv/netlist.py` |
 | Power rails, loads and connector pinouts | `electrical.py` |
 
 No other file holds dimensions.
@@ -105,6 +110,7 @@ No other file holds dimensions.
 |------|---------|
 | `config.py` | Every named dimension and rating, plus quick consistency checks |
 | `tv/board_data.py` | Component tables for all six circuit boards |
+| `tv/netlist.py` | The net list: what each component does and which nets it touches |
 | `tv/boards.py` | Turns those tables into 3D boards |
 | `tv/panel.py` | LCD cell, films, diffuser, backlight, steel chassis, source boards |
 | `tv/enclosure.py` | Front bezel and rear cover |
@@ -120,4 +126,5 @@ No other file holds dimensions.
 | `render.py` | PNG renders (a small numpy renderer, no GPU needed) |
 | `validate.py` | Pass / fail validation report |
 | `index.html` | three.js web viewer |
+| `viewer_boards.js` | Draws the circuit boards in detail: components, traces, silkscreen |
 | `smoke_test.py` | Confirms the CAD toolchain works on this machine |

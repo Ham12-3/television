@@ -5,7 +5,7 @@ Do not edit by hand; change the source and regenerate.
 
 **Level of detail.** This is a system-level reference design: what the blocks
 are, how they connect, what power they need and where the parts sit on each
-board. It contains no circuit schematics and no PCB layouts. Read section 9
+board. It contains no circuit schematics and no PCB layouts. Read section 10
 before using any of it.
 
 ## 1. Block diagram
@@ -290,7 +290,66 @@ and modules' datasheets.
 | Heatsinks | Main board HS1; PSU HS1, HS2 | SoC, switching transistor, output rectifiers |
 | Venting | Rear cover | Intake slots low, exhaust slots along the top |
 
-## 9. Limits: what this is not
+## 9. Net list
+
+`tv/netlist.py` records which nets every component touches and what the
+component is for. The viewer uses it: click a part to see its connections, or
+pick a net to light up everything on it. It is connectivity at block level
+(which parts share a rail or a signal bundle), not a pin-by-pin schematic.
+
+| Net | Type | Level | What it is | Parts on it |
+|---|---|---|---|---|
+| `AC_L` | Mains (dangerous) | 100-240 V AC | Mains live, from the inlet through the fuse and filter | 9 |
+| `AC_N` | Mains (dangerous) | 100-240 V AC | Mains neutral | 7 |
+| `HV_DC` | Mains (dangerous) | 140-340 V DC | Rectified mains on the bulk capacitor | 6 |
+| `PRI_SW` | Mains (dangerous) | switching, up to 600 V | Flyback switch node: transformer primary to the MOSFET | 3 |
+| `PGND` | Mains (dangerous) | primary ground (live) | Return on the mains side. Not safe to touch | 5 |
+| `+36V` | Power rails | 36 V | Backlight supply from the PSU to the LED driver | 10 |
+| `+12V` | Power rails | 12 V | Main supply: audio, panel and all on-board converters | 22 |
+| `+5V` | Power rails | 5 V | USB ports, HDMI +5 V, Wi-Fi module, tuner | 17 |
+| `+3V3` | Power rails | 3.3 V | Logic and input/output supply | 27 |
+| `+1V5` | Power rails | 1.5 V | DDR3 memory supply | 11 |
+| `+1V1` | Power rails | 1.1 V | Processor core supply | 13 |
+| `+3V3_STBY` | Power rails | 3.3 V always on | Standby supply: keeps the IR receiver alive when the TV is off | 5 |
+| `PANEL_BIAS` | Power rails | AVDD 16 V, VGH 28 V, VGL -6 V | Bias voltages the LCD needs, made on the T-con | 7 |
+| `LED+` | Power rails | up to 74 V | Top of the LED string | 3 |
+| `LED-` | Power rails | current sense | Bottom of the LED string, back through the sense resistors | 4 |
+| `LED_SW` | Power rails | switching, up to 80 V | Boost converter switch node | 3 |
+| `GND` | Ground | 0 V | Isolated ground: the reference for everything a user can touch | 95 |
+| `PS_ON` | Control | logic | Main board tells the PSU to leave standby | 3 |
+| `BL_ON` | Control | logic | Backlight enable | 6 |
+| `DIM` | Control | PWM | Backlight brightness | 6 |
+| `FB` | Control | analogue | Output-voltage feedback across the isolation barrier | 3 |
+| `I2C` | Control | I2C bus | Configuration bus: tuner, panel EEPROM, power-management IC | 11 |
+| `IR_RX` | Control | logic | Decoded infrared from the remote | 4 |
+| `KEY` | Control | analogue | The button on the set | 4 |
+| `LED_STBY` | Control | logic | Standby indicator drive | 4 |
+| `UART` | Control | serial | Service console | 2 |
+| `XTAL` | Control | 24 MHz | Processor clock | 2 |
+| `HDMI1` | Video | TMDS, 4 pairs + DDC | HDMI input 1 | 7 |
+| `HDMI2` | Video | TMDS, 4 pairs + DDC | HDMI input 2 | 7 |
+| `CVBS` | Video | analogue video | Composite video input | 2 |
+| `RF` | Video | RF 45-860 MHz | Antenna signal into the tuner | 2 |
+| `TS` | Video | transport stream | Demodulated broadcast data, tuner to processor | 2 |
+| `LVDS` | Video | LVDS, 10 pairs | Picture data, main board to T-con | 4 |
+| `MINI_LVDS` | Video | mini-LVDS | Column data, T-con to the source drivers | 3 |
+| `GAMMA` | Video | analogue references | Gamma reference voltages for the column drivers | 3 |
+| `GATE_CLK` | Video | level-shifted clocks | Row-scan clocks for the gate drivers in the glass | 4 |
+| `I2S` | Audio | digital audio | Processor to the audio amplifier | 2 |
+| `SPK_L` | Audio | 8 ohm speaker drive | Left speaker | 4 |
+| `SPK_R` | Audio | 8 ohm speaker drive | Right speaker | 4 |
+| `SPDIF` | Audio | digital audio | Optical audio output | 2 |
+| `HP_AUDIO` | Audio | analogue audio | Headphone output | 2 |
+| `AUDIO_IN` | Audio | analogue audio | Stereo audio input | 3 |
+| `DDR` | Data | DDR3 bus | Memory bus, processor to RAM | 3 |
+| `EMMC` | Data | eMMC bus | Storage bus | 2 |
+| `SPI` | Data | SPI bus | Boot flash | 2 |
+| `USB1` | Data | USB 2.0 | USB port 1 | 3 |
+| `USB2` | Data | USB 2.0 | USB port 2 | 3 |
+| `USB_WIFI` | Data | USB 2.0 | Wi-Fi / Bluetooth module link | 4 |
+| `ETH` | Data | 100BASE-TX | Ethernet | 2 |
+
+## 10. Limits: what this is not
 
 1. **Not a buildable design.** There are no schematics, netlists, PCB layouts
    or firmware. Component positions are a plausible arrangement, not a routed
@@ -310,7 +369,7 @@ and modules' datasheets.
 7. **Parts are generic.** The bill of materials describes kinds of part, not
    orderable part numbers.
 
-## 10. Bill of materials
+## 11. Bill of materials
 
 `output/bom.csv`, written by this script: 130 lines covering every
 board, the mechanical parts, the cables and the accessories.

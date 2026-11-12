@@ -8,8 +8,11 @@
   Local viewer for the complete television: enclosure, panel, backlight,
   chassis, circuit boards, cables, wall mount, stand feet and remote.
 
-  It reads output/stl/manifest.json (written by export.py) and loads every STL
-  listed there, so new or renamed parts show up without editing this file.
+  - output/stl/manifest.json lists every item and its STL mesh.
+  - output/stl/boards.json describes the circuit boards part by part, with the
+    electrical net list. viewer_boards.js draws the boards from it, so every
+    component can be clicked, labelled and traced.
+  Both files are written by export.py.
 
   Browsers block file loading from a page opened by double-click, so serve the
   project folder first:
@@ -23,12 +26,12 @@
 <style>
   :root {
     --bg: #f4f4f2; --panel: #ffffff; --text: #1d1d1f; --muted: #6b6b70;
-    --line: #dcdcd8; --accent: #c4621a; --button: #ececea;
+    --line: #dcdcd8; --accent: #c4621a; --button: #ececea; --card: rgba(255,255,255,.96);
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #1c1d21; --panel: #25262b; --text: #ececee; --muted: #9a9aa2;
-      --line: #393a41; --accent: #f08a3c; --button: #31323a;
+      --line: #393a41; --accent: #f08a3c; --button: #31323a; --card: rgba(37,38,43,.96);
     }
   }
   * { box-sizing: border-box; }
@@ -39,16 +42,17 @@
     display: flex; overflow: hidden;
   }
   #panel {
-    width: 320px; flex: none; background: var(--panel);
+    width: 330px; flex: none; background: var(--panel);
     border-right: 1px solid var(--line); padding: 16px; overflow-y: auto;
   }
-  #stage { flex: 1; position: relative; min-width: 0; }
+  #stage { flex: 1; position: relative; min-width: 0; overflow: hidden; }
   canvas { display: block; }
   h1 { font-size: 16px; margin: 0 0 2px; }
   h2 {
     font-size: 11px; font-weight: 600; letter-spacing: .06em;
     text-transform: uppercase; color: var(--muted); margin: 18px 0 8px;
   }
+  h3 { font-size: 11px; font-weight: 600; color: var(--muted); margin: 10px 0 5px; }
   .sub { color: var(--muted); font-size: 12px; margin: 0; }
   .row { display: flex; gap: 6px; flex-wrap: wrap; }
   button {
@@ -60,6 +64,13 @@
   input[type=range] { width: 100%; accent-color: var(--accent); }
   input[type=checkbox] { accent-color: var(--accent); margin: 0; flex: none; }
   label.opt { display: flex; gap: 8px; align-items: center; padding: 3px 0; cursor: pointer; }
+
+  .net {
+    display: inline-flex; align-items: center; gap: 5px; font-size: 12px;
+    padding: 2px 8px 2px 6px; border-radius: 999px;
+  }
+  .net i { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+  .net.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
 
   details.group { border-bottom: 1px solid var(--line); }
   details.group > summary {
@@ -77,8 +88,32 @@
   }
   .part small { display: block; color: var(--muted); font-size: 11px; }
   .swatch { width: 12px; height: 12px; border-radius: 3px; border: 1px solid var(--line); }
+
   #hint { position: absolute; left: 12px; bottom: 10px; color: var(--muted); font-size: 12px; pointer-events: none; }
   #status { position: absolute; right: 12px; bottom: 10px; color: var(--muted); font-size: 12px; }
+  #labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .lbl {
+    font: 600 10px/1 system-ui, sans-serif; color: #fff; background: rgba(20,20,22,.78);
+    padding: 2px 4px; border-radius: 3px; white-space: nowrap; pointer-events: auto; cursor: pointer;
+    border: 1px solid rgba(255,255,255,.25);
+  }
+  .lbl:hover { background: var(--accent); }
+
+  #card {
+    position: absolute; top: 12px; right: 12px; width: 320px; max-height: calc(100% - 24px);
+    overflow-y: auto; background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 12px 14px; display: none; box-shadow: 0 6px 24px rgba(0,0,0,.25);
+  }
+  #card h4 { margin: 0 26px 2px 0; font-size: 15px; }
+  #card p { margin: 6px 0; }
+  #card .where { color: var(--muted); font-size: 12px; margin: 0; }
+  #card .close { position: absolute; top: 8px; right: 8px; padding: 0 7px; line-height: 22px; }
+  #card dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; margin: 8px 0; font-size: 12px; }
+  #card dt { color: var(--muted); }
+  #card dd { margin: 0; }
+  #card .warn { color: #e5484d; font-weight: 600; font-size: 12px; }
+  #card ul { margin: 4px 0; padding-left: 18px; font-size: 12px; max-height: 160px; overflow-y: auto; }
+
   #error {
     position: absolute; inset: 0; display: none; align-items: center;
     justify-content: center; padding: 24px; text-align: center;
@@ -88,6 +123,7 @@
   @media (max-width: 700px) {
     body { flex-direction: column-reverse; }
     #panel { width: 100%; max-height: 48%; border-right: 0; border-top: 1px solid var(--line); }
+    #card { width: auto; left: 12px; max-height: 60%; }
   }
 </style>
 </head>
@@ -102,6 +138,8 @@
     <button data-preset="all">Whole TV</button>
     <button data-preset="inside">Back cover off</button>
     <button data-preset="boards">Boards only</button>
+    <button data-preset="main">Main board</button>
+    <button data-preset="psu">Power supply</button>
     <button data-preset="backlight">Backlight</button>
     <button data-preset="mount">Wall mount</button>
     <button data-preset="remote">Remote</button>
@@ -120,6 +158,13 @@
   <h2>Explode</h2>
   <input id="explode" type="range" min="0" max="1" step="0.01" value="0" aria-label="Explode amount">
 
+  <h2>Electrical</h2>
+  <p class="sub">Click any part to see what it is and what it connects to. Pick a net
+    to light up everything on it.</p>
+  <div id="nets"></div>
+  <div class="row" style="margin-top:8px"><button id="clearNet">Clear highlight</button></div>
+  <label class="opt" style="margin-top:6px"><input id="labelsOn" type="checkbox" checked> Component labels (when zoomed in)</label>
+
   <h2>Parts</h2>
   <div id="groups"></div>
 
@@ -129,8 +174,10 @@
 </aside>
 
 <main id="stage">
-  <div id="hint">Drag to rotate, scroll to zoom, right-drag to pan</div>
+  <div id="labels"></div>
+  <div id="hint">Drag to rotate, scroll to zoom, right-drag to pan, click a part for details</div>
   <div id="status"></div>
+  <div id="card"></div>
   <div id="error"><div>
     <p><strong>Could not load the model.</strong></p>
     <p id="errorText" class="sub"></p>
@@ -152,10 +199,13 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { STLLoader } from "three/addons/loaders/STLLoader.js";
+import { buildBoards } from "./viewer_boards.js";
 
 const STL_FOLDER = "output/stl/";
 const stage = document.getElementById("stage");
 const statusLine = document.getElementById("status");
+const card = document.getElementById("card");
+const labelLayer = document.getElementById("labels");
 const dark = matchMedia("(prefers-color-scheme: dark)");
 
 // ---- scene ---------------------------------------------------------------
@@ -165,7 +215,7 @@ renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 stage.prepend(renderer.domElement);
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(32, 1, 5, 20000);
+const camera = new THREE.PerspectiveCamera(32, 1, 1, 20000);
 camera.up.set(0, 0, 1);
 
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -190,62 +240,101 @@ function applyTheme() {
 dark.addEventListener("change", applyTheme);
 applyTheme();
 
-// ---- parts ---------------------------------------------------------------
-const parts = [];                             // { entry, group, mesh, edges, box }
+// ---- model data ------------------------------------------------------------
+const parts = [];                             // one per viewer entry: { entry, group, box, ... }
 const byGroup = new Map();                    // group name -> parts
+const byName = new Map();                     // entry name -> part
+let loaded = false;                           // true once every part is in the scene
+let electrical = null;                        // boards.json
+let boards = null;                            // result of buildBoards()
+const netInfo = new Map();                    // net name -> { name, kind, level, colour, about }
 const centre = new THREE.Vector3();
 let radius = 400;
 
 async function loadModel() {
-  const response = await fetch(STL_FOLDER + "manifest.json");
-  if (!response.ok) throw new Error("manifest.json not found (HTTP " + response.status + ")");
-  const manifest = await response.json();
-  const loader = new STLLoader();
-  let done = 0;
+  const [manifest, boardData] = await Promise.all(
+    ["manifest.json", "boards.json"].map(async (file) => {
+      const response = await fetch(STL_FOLDER + file);
+      if (!response.ok) throw new Error(`${file} not found (HTTP ${response.status})`);
+      return response.json();
+    }));
+  electrical = boardData;
+  electrical.nets.forEach((n) => netInfo.set(n.name, n));
+  boards = buildBoards(electrical, renderer);
 
-  await Promise.all(manifest.parts.map(async (entry, index) => {
-    const geometry = await loader.loadAsync(STL_FOLDER + entry.file);
-    geometry.computeVertexNormals();
+  const loader = new STLLoader();
+  // Python's simple web server refuses connections if too many arrive at
+  // once, so try again a few times before giving up.
+  const loadMesh = async (file) => {
+    for (let attempt = 1; ; attempt++) {
+      try { return await loader.loadAsync(STL_FOLDER + file); }
+      catch (err) {
+        if (attempt >= 4) throw new Error(`could not load ${file}`);
+        await new Promise((resolve) => setTimeout(resolve, 250 * attempt));
+      }
+    }
+  };
+  let done = 0;
+  const loadEntry = async (entry, index) => {
     const colour = new THREE.Color().setRGB(...entry.colour, THREE.SRGBColorSpace);
-    const seeThrough = (entry.opacity ?? 1) < 1;
-    const mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
-      color: colour, roughness: 0.7, metalness: 0.05,
-      transparent: seeThrough, opacity: entry.opacity ?? 1, depthWrite: !seeThrough }));
-    // Outline sharp edges so dark parts stay readable against each other.
-    const edges = new THREE.LineSegments(
-      new THREE.EdgesGeometry(geometry, 35),
-      new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.35 }));
-    const group = new THREE.Group();
-    group.add(mesh, edges);
+    let group, mesh = null, edges = null;
+    if (entry.procedural && boards.groups.has(entry.name)) {
+      group = boards.groups.get(entry.name);          // drawn in detail from boards.json
+    } else {
+      const geometry = await loadMesh(entry.file);
+      geometry.computeVertexNormals();
+      const seeThrough = (entry.opacity ?? 1) < 1;
+      mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
+        color: colour, roughness: 0.7, metalness: 0.05,
+        transparent: seeThrough, opacity: entry.opacity ?? 1, depthWrite: !seeThrough }));
+      mesh.userData.pick = { type: "item", entry };
+      // Outline sharp edges so dark parts stay readable against each other.
+      edges = new THREE.LineSegments(
+        new THREE.EdgesGeometry(geometry, 35),
+        new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.35 }));
+      group = new THREE.Group();
+      group.add(mesh, edges);
+    }
     group.visible = entry.visible !== false;
     scene.add(group);
-    geometry.computeBoundingBox();
-    parts.push({ entry, group, mesh, edges, colour, index, box: geometry.boundingBox.clone() });
+    group.updateMatrixWorld(true);
+    const part = { entry, group, mesh, edges, colour, index, box: new THREE.Box3().setFromObject(group) };
+    group.userData.part = part;
+    parts.push(part);
     statusLine.textContent = `Loading ${++done} / ${manifest.parts.length}`;
+  };
+  // Load four files at a time rather than all at once.
+  const queue = manifest.parts.map((entry, index) => [entry, index]);
+  await Promise.all(Array.from({ length: 4 }, async () => {
+    while (queue.length) await loadEntry(...queue.shift());
   }));
   statusLine.textContent = "";
+  loaded = true;
 
   parts.sort((a, b) => a.index - b.index);    // keep the manifest order
   for (const p of parts) {
+    byName.set(p.entry.name, p);
     if (!byGroup.has(p.entry.group)) byGroup.set(p.entry.group, []);
     byGroup.get(p.entry.group).push(p);
   }
 
   buildPartTree();
+  buildNetList();
+  buildLabels();
   if (manifest.tv) {
     const tv = manifest.tv;
+    const count = electrical.boards.reduce((n, b) => n + b.parts.length, 0);
     document.getElementById("summary").textContent =
       `${tv.size_mm[0]} x ${tv.size_mm[2]} x ${tv.size_mm[1]} mm, about ${tv.mass_kg} kg, ` +
-      `${parts.length} items. Reference design, not a real product.`;
+      `${count} components on ${electrical.boards.length} boards, ${electrical.nets.length} nets. ` +
+      `Reference design, not a real product.`;
   }
-  applyPreset("all");
-  setView("iso");
+  applyPreset("inside");                      // open with the back cover off: the boards are the point
 }
 
-function label(name) {
-  return name.replace(/_/g, " ");
-}
+const label =(name) => name.replace(/_/g, " ");
 
+// ---- sidebar: part tree ------------------------------------------------------
 function buildPartTree() {
   const root = document.getElementById("groups");
   for (const [groupName, members] of byGroup) {
@@ -261,10 +350,9 @@ function buildPartTree() {
     const master = details.querySelector("input");
     master.addEventListener("click", (e) => e.stopPropagation());   // do not fold the group
     master.addEventListener("change", () => {
-      members.forEach((p) => setVisible(p, master.checked));
+      members.forEach((p) => { p.group.visible = master.checked; });
       frame();
     });
-
     for (const p of members) {
       const row = document.createElement("label");
       row.className = "part";
@@ -277,19 +365,11 @@ function buildPartTree() {
         <span>${label(p.entry.name)}
           <small>${count}${sx} x ${sy} x ${sz} mm, ${p.entry.mass_g} g</small>${note}</span>`;
       p.checkbox = row.querySelector("input");
-      p.checkbox.addEventListener("change", () => {
-        setVisible(p, p.checkbox.checked);
-        frame();
-      });
+      p.checkbox.addEventListener("change", () => { p.group.visible = p.checkbox.checked; frame(); });
       details.append(row);
     }
     root.append(details);
   }
-  syncCheckboxes();
-}
-
-function setVisible(p, on) {
-  p.group.visible = on;
 }
 
 function syncCheckboxes() {
@@ -307,25 +387,25 @@ function syncCheckboxes() {
 const BOARD_GROUPS = ["Main board", "Power supply board", "T-con board", "LED driver board",
                       "Wi-Fi / Bluetooth module", "IR / LED / key board"];
 const PRESETS = {
-  // everything that is fitted, plus the remote
   all: (p) => p.entry.group !== "Stand feet",
-  // rear cover and wall mount removed, so the boards are visible from the back
   inside: (p) => !["Stand feet", "Wall mount", "Remote control"].includes(p.entry.group)
                  && !["rear_cover", "cover_screws"].includes(p.entry.name),
   boards: (p) => BOARD_GROUPS.includes(p.entry.group) || p.entry.group === "Cables",
+  main: (p) => p.entry.group === "Main board",
+  psu: (p) => p.entry.group === "Power supply board",
   backlight: (p) => ["back_chassis", "led_strips", "led_chips", "led_lenses", "reflector_sheet",
                      "support_pins"].includes(p.entry.name),
   mount: (p) => p.entry.group === "Wall mount",
   remote: (p) => p.entry.group === "Remote control",
 };
-const PRESET_VIEW = { all: "iso", inside: "isoBack", boards: "back", backlight: "iso",
-                      mount: "isoBack", remote: "iso" };
+const PRESET_VIEW = { all: "iso", inside: "isoBack", boards: "back", main: "back", psu: "back",
+                      backlight: "iso", mount: "isoBack", remote: "iso" };
 
 function applyPreset(name) {
-  parts.forEach((p) => setVisible(p, PRESETS[name](p)));
+  if (!loaded) return;                        // buttons do nothing until the model is in
+  parts.forEach((p) => { p.group.visible = PRESETS[name](p); });
   document.querySelectorAll("[data-preset]").forEach((b) =>
     b.classList.toggle("on", b.dataset.preset === name));
-  syncCheckboxes();
   frame();
   setView(PRESET_VIEW[name]);
 }
@@ -333,12 +413,10 @@ document.querySelectorAll("[data-preset]").forEach((button) =>
   button.addEventListener("click", () => applyPreset(button.dataset.preset)));
 
 // ---- camera ----------------------------------------------------------------
-// Fit the camera to whatever is visible right now.
-function frame() {
+function frame() {                            // fit to whatever is visible
   const box = new THREE.Box3();
   for (const p of parts) {
-    if (!p.group.visible) continue;
-    box.union(p.box.clone().translate(p.group.position));
+    if (p.group.visible) box.union(p.box.clone().translate(p.group.position));
   }
   if (box.isEmpty()) return;
   box.getCenter(centre);
@@ -362,8 +440,8 @@ function setView(name) {
   const distance = radius / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.05;
   controls.target.copy(centre);
   camera.position.copy(centre).addScaledVector(direction, distance);
-  camera.near = Math.max(distance / 500, 1);
-  camera.far = distance * 20;
+  camera.near = Math.max(distance / 2000, 0.5);
+  camera.far = distance * 40;
   camera.updateProjectionMatrix();
   controls.update();
 }
@@ -376,15 +454,286 @@ document.getElementById("explode").addEventListener("input", (e) => {
     const [x, y, z] = p.entry.explode ?? [0, 0, 0];
     p.group.position.set(x * amount, y * amount, z * amount);
   }
+  updateSelectionBox();
 });
 document.getElementById("explode").addEventListener("change", () => { frame(); setView(currentView); });
-
 document.getElementById("edges").addEventListener("change", (e) => {
-  parts.forEach((p) => { p.edges.visible = e.target.checked; });
+  parts.forEach((p) => { if (p.edges) p.edges.visible = e.target.checked; });
 });
-document.getElementById("wall").addEventListener("change", (e) => {
-  wall.visible = e.target.checked;
+document.getElementById("wall").addEventListener("change", (e) => { wall.visible = e.target.checked; });
+
+// ---- electrical: nets --------------------------------------------------------
+let activeNet = null;
+const halos = [];                             // highlight boxes currently in the scene
+
+function netChip(name) {
+  const n = netInfo.get(name);
+  const b = document.createElement("button");
+  b.className = "net" + (activeNet === name ? " on" : "");
+  b.dataset.net = name;
+  b.title = `${n.level}: ${n.about}`;
+  b.innerHTML = `<i style="background:${n.colour}"></i>${name}`;
+  b.addEventListener("click", () => selectNet(activeNet === name ? null : name));
+  return b;
+}
+
+function buildNetList() {
+  const root = document.getElementById("nets");
+  for (const { kind, title } of electrical.kinds) {
+    const heading = document.createElement("h3");
+    heading.textContent = title;
+    const row = document.createElement("div");
+    row.className = "row";
+    electrical.nets.filter((n) => n.kind === kind).forEach((n) => row.append(netChip(n.name)));
+    root.append(heading, row);
+  }
+}
+
+// Everything connected to a net: [{ text, pick }] for the card, and what to light up.
+function netMembers(name) {
+  const members = [];
+  for (const c of boards.components) {
+    if (c.part.nets.includes(name)) members.push({ text: `${c.board.title}: ${c.part.ref} - ${c.part.desc}`, component: c });
+  }
+  for (const p of parts) {
+    if ((p.entry.nets ?? []).includes(name)) members.push({ text: label(p.entry.name), item: p });
+  }
+  return members;
+}
+
+function selectNet(name) {
+  activeNet = name;
+  halos.splice(0).forEach((h) => h.parent.remove(h));
+  parts.forEach((p) => { if (p.mesh) p.mesh.material.emissive.setHex(0x000000); });
+  boards.redraw(name);                        // repaint the copper traces
+  document.querySelectorAll(".net").forEach((b) => b.classList.toggle("on", b.dataset.net === name));
+  if (!name) return;
+
+  const n = netInfo.get(name);
+  const material = new THREE.MeshBasicMaterial({ color: n.colour, transparent: true, opacity: 0.55, depthWrite: false });
+  const members = netMembers(name);
+  for (const m of members) {
+    if (m.component) {
+      const p = m.component.part;
+      const halo = new THREE.Mesh(new THREE.BoxGeometry(p.su + 0.8, p.sv + 0.8, p.h + 0.5), material);
+      halo.position.z = p.h / 2;
+      halo.userData.halo = true;
+      m.component.object.add(halo);
+      halos.push(halo);
+    } else if (m.item.mesh) {
+      m.item.mesh.material.emissive.set(n.colour).multiplyScalar(0.55);
+    }
+  }
+  showNetCard(n, members);
+}
+
+// ---- click to inspect ---------------------------------------------------------
+const raycaster = new THREE.Raycaster();
+const selection = new THREE.Box3Helper(new THREE.Box3(), 0xf08a3c);
+selection.visible = false;
+scene.add(selection);
+let selected = null;                          // the THREE object that is selected
+
+function isShown(object) {
+  for (let o = object; o; o = o.parent) if (!o.visible) return false;
+  return true;
+}
+
+function pickAt(clientX, clientY) {
+  const rect = renderer.domElement.getBoundingClientRect();
+  const pointer = new THREE.Vector2(((clientX - rect.left) / rect.width) * 2 - 1,
+                                    -((clientY - rect.top) / rect.height) * 2 + 1);
+  raycaster.setFromCamera(pointer, camera);
+  const roots = parts.filter((p) => p.group.visible).map((p) => p.group);
+  for (const hit of raycaster.intersectObjects(roots, true)) {
+    if (hit.object.isLineSegments || hit.object.userData.halo || !isShown(hit.object)) continue;
+    for (let o = hit.object; o; o = o.parent) {
+      if (o.userData.pick) return { object: o, pick: o.userData.pick };
+    }
+  }
+  return null;
+}
+
+function updateSelectionBox() {
+  if (!selected) { selection.visible = false; return; }
+  selection.box.setFromObject(selected);
+  selection.visible = isShown(selected);
+}
+
+function select(found) {
+  selected = found ? found.object : null;
+  updateSelectionBox();
+  if (!found) { card.style.display = "none"; return; }
+  const { pick } = found;
+  if (pick.type === "component") showComponentCard(pick.board, pick.part);
+  else if (pick.type === "board") showBoardCard(pick.board);
+  else if (pick.type === "screw") showSimpleCard("Board screw", pick.board.title, "M3 pan-head screw holding the board to a steel standoff on the chassis.");
+  else showItemCard(pick.entry);
+}
+
+let downAt = null;
+renderer.domElement.addEventListener("pointerdown", (e) => { downAt = [e.clientX, e.clientY]; });
+renderer.domElement.addEventListener("pointerup", (e) => {
+  if (!downAt || Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 4) return;   // it was a drag
+  select(pickAt(e.clientX, e.clientY));
 });
+
+// ---- info card ------------------------------------------------------------------
+const PACKAGE_NAME = {
+  bga: "Ball-grid array (connections underneath)", qfn: "Leadless package", qfp: "Quad flat pack",
+  soic: "Small-outline package with legs", sot: "Small transistor-style package", dip: "Dual in-line package",
+  dpak: "Surface-mount power package", to220: "TO-220 power package", to92: "TO-92",
+  bridge: "In-line bridge package", smd_diode: "Surface-mount diode", ecap: "Aluminium electrolytic can",
+  boxcap: "Box film capacitor", disc: "Disc, through-hole", fuse: "Glass cartridge fuse in clips",
+  tantalum: "Moulded tantalum chip", crystal: "Metal can", can: "Soldered shield can",
+  chip_r: "Chip resistor", chip_c: "Chip capacitor", inductor: "Shielded power inductor",
+  drum: "Drum-core inductor", toroid: "Ring-core choke", transformer: "Bobbin transformer with ferrite core",
+  plate: "Aluminium plate", fins: "Finned aluminium extrusion", wafer: "Wire-to-board connector",
+  header: "Pin header", ffc: "Flat-flex cable socket", hdmi: "HDMI type A socket", usb: "USB type A socket",
+  rj45: "RJ45 socket", toslink: "Optical socket", jack: "3.5 mm jack", rca: "RCA (phono) socket",
+  coax: "Coaxial socket", ir: "Infrared receiver module", led: "3 mm LED", switch: "Tactile switch",
+  plunger: "Switch plunger", box: "",
+};
+
+function openCard(html) {
+  card.innerHTML = `<button class="close" aria-label="Close">x</button>` + html;
+  card.style.display = "block";
+  card.querySelector(".close").addEventListener("click", () => select(null));
+}
+
+function netRow(names) {
+  const row = document.createElement("div");
+  row.className = "row";
+  names.forEach((n) => row.append(netChip(n)));
+  return row;
+}
+
+function connectedText(names, selfText) {
+  // Other things that share a signal or power net with this part (ground is left
+  // out: nearly everything is on it).
+  const seen = new Set(), lines = [];
+  for (const name of names) {
+    if (netInfo.get(name).kind === "ground") continue;
+    for (const m of netMembers(name)) {
+      if (m.text === selfText || seen.has(m.text)) continue;
+      seen.add(m.text);
+      lines.push(`<li>${m.text.split(" - ")[0]} <span class="sub">via ${name}</span></li>`);
+    }
+  }
+  return lines;
+}
+
+function showComponentCard(board, part) {
+  const self = `${board.title}: ${part.ref} - ${part.desc}`;
+  const mains = part.nets.some((n) => netInfo.get(n).kind === "mains");
+  const links = connectedText(part.nets, self);
+  openCard(`
+    <h4>${part.ref}</h4>
+    <p class="where">${board.title}</p>
+    <p><strong>${part.desc}</strong></p>
+    <p>${part.role || ""}</p>
+    ${mains ? `<p class="warn">On the mains side of the safety barrier.</p>` : ""}
+    <dl>
+      <dt>Package</dt><dd>${PACKAGE_NAME[part.pkg] || part.pkg}</dd>
+      <dt>Size</dt><dd>${part.su} x ${part.sv} mm, ${part.h} mm tall</dd>
+      <dt>Position</dt><dd>${part.u}, ${part.v} mm from the board centre</dd>
+    </dl>
+    <h3>Nets (click one to light it up)</h3><div id="cardNets"></div>
+    ${links.length ? `<h3>Connected to ${links.length} other parts</h3><ul>${links.slice(0, 40).join("")}</ul>` : ""}`);
+  card.querySelector("#cardNets").append(
+    part.nets.length ? netRow(part.nets) : Object.assign(document.createElement("p"), { className: "sub", textContent: "No electrical connection (mechanical part)." }));
+}
+
+function showBoardCard(board) {
+  const used = new Set(board.parts.flatMap((p) => p.nets));
+  openCard(`
+    <h4>${board.title}</h4>
+    <p class="where">Bare printed circuit board</p>
+    <dl>
+      <dt>Size</dt><dd>${board.size[0]} x ${board.size[1]} mm, ${board.thickness} mm thick</dd>
+      <dt>Copper layers</dt><dd>${board.layers}</dd>
+      <dt>Components</dt><dd>${board.parts.length}</dd>
+    </dl>
+    <p class="sub">The pale lines are copper traces. They follow the net list: each one joins parts
+      that share a signal or supply. Their exact paths are illustrative.</p>
+    <h3>Nets on this board</h3><div id="cardNets"></div>`);
+  card.querySelector("#cardNets").append(netRow([...used]));
+}
+
+function showItemCard(entry) {
+  const nets = entry.nets ?? [];
+  const [sx, sy, sz] = entry.size_mm;
+  openCard(`
+    <h4>${label(entry.name)}</h4>
+    <p class="where">${entry.group}</p>
+    <p>${entry.role || entry.note || ""}</p>
+    <dl>
+      <dt>Size</dt><dd>${sx} x ${sy} x ${sz} mm</dd>
+      <dt>Mass</dt><dd>${entry.mass_g} g${entry.count > 1 ? ` (${entry.count} pieces)` : ""}</dd>
+    </dl>
+    ${nets.length ? `<h3>Carries these nets</h3><div id="cardNets"></div>` : ""}`);
+  if (nets.length) card.querySelector("#cardNets").append(netRow(nets));
+}
+
+function showSimpleCard(title, where, text) {
+  openCard(`<h4>${title}</h4><p class="where">${where}</p><p>${text}</p>`);
+}
+
+function showNetCard(n, members) {
+  selected = null;
+  updateSelectionBox();
+  openCard(`
+    <h4><span class="net" style="padding-left:0"><i style="background:${n.colour}"></i>${n.name}</span></h4>
+    <p class="where">${electrical.kinds.find((k) => k.kind === n.kind).title} - ${n.level}</p>
+    <p>${n.about}</p>
+    ${n.kind === "mains" ? `<p class="warn">Mains voltage. Dangerous in a real set.</p>` : ""}
+    <h3>${members.length} things on this net</h3>
+    <ul>${members.map((m) => `<li>${m.text}</li>`).join("")}</ul>`);
+}
+
+document.getElementById("clearNet").addEventListener("click", () => { selectNet(null); select(null); });
+
+// ---- floating component labels ---------------------------------------------------
+const labels = [];                            // { element, component, anchor }
+
+function buildLabels() {
+  for (const component of boards.components) {
+    const { part } = component;
+    if (part.kind === "passive" && Math.max(part.su, part.sv) < 4) continue;   // too many, too small
+    if (part.pkg === "plunger") continue;
+    const element = document.createElement("div");
+    element.className = "lbl";
+    element.textContent = part.ref;
+    element.title = part.desc;
+    element.style.position = "absolute";
+    element.addEventListener("click", () => select({ object: component.object, pick: component.object.userData.pick }));
+    labelLayer.append(element);
+    labels.push({ element, component, anchor: new THREE.Vector3(0, 0, part.h + 0.6) });
+  }
+}
+
+const projected = new THREE.Vector3();
+function updateLabels() {
+  const on = document.getElementById("labelsOn").checked;
+  const { clientWidth: w, clientHeight: h } = stage;
+  for (const l of labels) {
+    let show = on && isShown(l.component.object);
+    if (show) {
+      projected.copy(l.anchor);
+      l.component.object.localToWorld(projected);
+      const distance = camera.position.distanceTo(projected);
+      // Boards face the back, so hide their labels when looking from the front.
+      const facing = (camera.position.y - projected.y) * l.component.board.direction > 0;
+      projected.project(camera);
+      show = facing && distance < 760 && projected.z < 1 && Math.abs(projected.x) < 1 && Math.abs(projected.y) < 1;
+      if (show) {
+        l.element.style.transform =
+          `translate(-50%, -110%) translate(${(projected.x + 1) / 2 * w}px, ${(1 - projected.y) / 2 * h}px)`;
+      }
+    }
+    l.element.style.display = show ? "" : "none";
+  }
+}
 
 // ---- render loop ---------------------------------------------------------
 function resize() {
@@ -403,9 +752,11 @@ renderer.setAnimationLoop(() => {
   offset.set(0.2, 0, 0.5).multiplyScalar(camera.position.distanceTo(controls.target));
   key.position.copy(camera.position).add(offset);
   renderer.render(scene, camera);
+  if (boards) updateLabels();
 });
 
 loadModel().catch((err) => {
+  console.error(err);
   document.getElementById("errorText").textContent = String(err.message || err);
   document.getElementById("error").style.display = "flex";
 });

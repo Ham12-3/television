@@ -108,6 +108,13 @@ def export_tv(manifest: dict) -> int:
         "centre_of_mass_from_wall_mm": round(float(centre[1]), 1),
     }
 
+    # Board and net data: the viewer draws the circuit boards from this, part
+    # by part, so every component can be clicked and explained.
+    from tv import netlist
+    electrical = netlist.export()
+    (STL_DIR / "boards.json").write_text(json.dumps(electrical))
+    board_titles = {b["title"] for b in electrical["boards"]}
+
     problems, triangles = 0, 0
     children = []
     print(f"{'Television item':32s} {'Solids':>6s} {'Triangles':>10s}  Watertight")
@@ -132,6 +139,11 @@ def export_tv(manifest: dict) -> int:
             "mass_g": round(item.mass_g(), 1),
             "count": len(item.solids()),
             "note": item.note,
+            # Circuit boards are drawn in detail by the viewer from boards.json;
+            # their STL files are still written for other tools.
+            "procedural": item.group in board_titles,
+            "nets": electrical["item_nets"].get(item.name, []),
+            "role": electrical["item_role"].get(item.name, ""),
         })
         item.shape.label = item.name
         item.shape.color = Color(*item.colour, item.opacity)

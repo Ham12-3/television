@@ -112,8 +112,10 @@ selectable in the viewer, but hidden by default and left out of the clash check.
 
 ## 8. Simplifications in the 3D model
 
-- Components are plain boxes and cylinders of the right size. No pins, no
-  solder, no markings, no board artwork.
+- In the CAD files (STEP, STL) components are plain boxes and cylinders of the
+  right size. The web viewer draws them in more detail (legs, cans, sockets,
+  windings) and paints traces and silkscreen on the boards. Trace paths are
+  illustrative: they join the right parts, but they are not a routed layout.
 - Screw threads are not modelled. Threaded holes are drawn at the screw's
   nominal diameter.
 - Cables are straight box segments along their routes; real ones curve.
@@ -130,7 +132,7 @@ selectable in the viewer, but hidden by default and left out of the clash check.
 1. **Reference design only.** No tolerance analysis, no mould-flow, no drop,
    vibration or thermal testing has been done.
 2. **The electrical side is block level.** No schematics or PCB layouts exist;
-   see ELECTRICAL.md section 9. Do not build the mains power supply from this.
+   see ELECTRICAL.md section 10. Do not build the mains power supply from this.
 3. **No compliance work.** A real television must pass product-safety, EMC and
    radio certification.
 4. **The mass and centre of mass feed the wall-mount calculation.** If you

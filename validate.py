@@ -423,6 +423,17 @@ def check_television(report):
     for text, ok, detail in electrical.checks():
         report.check(text, ok, detail)
 
+    from tv import netlist
+    gaps = netlist.problems()
+    parts_total = sum(len(b["parts"]) for b in BOARDS)
+    report.check("Every component is in the net list, and every net joins at least two things",
+                 not gaps, "; ".join(gaps[:3]) or f"{parts_total} components, {len(netlist.NETS)} nets")
+    boards_file = STL_DIR / "boards.json"
+    exported = (sum(len(b["parts"]) for b in json.loads(boards_file.read_text())["boards"])
+                if boards_file.exists() else -1)
+    report.check("Board and net data exported for the viewer matches the design",
+                 exported == parts_total, f"{exported} components in boards.json")
+
 
 def main() -> int:
     print("Building parts from config.py ...")
